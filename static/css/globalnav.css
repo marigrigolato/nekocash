@@ -41,7 +41,7 @@ a {
   font-weight: 400;
   text-transform: uppercase; 
   letter-spacing: 0.07em;
-  padding: 0 1em;
+  padding: 0 1em 0 0;
 }
 
 @media screen and (max-width: 750px) {
