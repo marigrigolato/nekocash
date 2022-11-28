@@ -213,3 +213,8 @@ def edit_transacoes(id_transacao):
         return redirect('/consultar')
 
       return render_template('index.html', transacao=registro)
+
+@app.route('/relatorio', methods=['GET'])
+def relatorio():
+
+  render_template('relatorio.html')
