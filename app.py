@@ -215,6 +215,10 @@ def edit_transacoes(id_transacao):
       return render_template('index.html', transacao=registro)
 
 @app.route('/relatorio', methods=['GET'])
-def relatorio():
+def relatorio_tag():
+
+  # conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432') 
+
+  # cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) 
 
   render_template('relatorio.html')
