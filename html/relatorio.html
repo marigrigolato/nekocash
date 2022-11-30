@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/globalnav.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/consultar.css"/>    
     <link rel="stylesheet" type="text/css" href="/static/css/globalfooter.css"/>
   </head>
   <body>
@@ -37,7 +38,47 @@
     </header>
     <main>
       <section>
-        <h3 class="section-title">Relatório de Tags</h3>        
+        <h3 class="section-title">Relatório de Tags</h3> 
+        <form>
+          <div class="field">
+            <div class="label-icons">
+              <img src="/static/img/date.svg" alt="Date Icon" class="icon">
+              <label>Mês</label>
+            </div>  
+            <input type="month" name="data" id="date" value="">
+          </div>              
+          <button type="submit" class="button">Gerar</button>
+        </form>        
+        <table>
+          <thead>
+            <tr>
+              <th>Tag</th>
+              <th>Valor</th>
+              <th>Qtd. Txs.</th>                            
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tags">
+                <div class="tags-1">dogs</div>
+              </td>
+              <td class="money">R$500,00</td>
+              <td>3</td>                            
+            </tr>
+            <tr>
+              <td class="tags">
+                <div class="tags-2">ifood</div>
+              </td>
+              <td class="money">R$800,00</td>
+              <td>20</td>                            
+            </tr>
+            <tr>
+              <td>TOTAL</td>
+              <td class="money">R$1.300,00</td>
+              <td>23</td>                            
+            </tr>                        
+          </tbody>
+        </table>         
       </section>
     </main>
     <footer>
