@@ -97,6 +97,26 @@ select {
   background: #f8f9fa;
 }
 
+/* input[type="file"] {
+  display: none;
+} */
+
+.upload {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+#upload-file {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+#upload {
+  color: #555555;
+}
+
 .button {
   display: block;
   margin: 0 auto;

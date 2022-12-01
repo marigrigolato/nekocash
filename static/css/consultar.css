@@ -105,7 +105,7 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   background-color: rgb(237, 237, 237);
 }
 
-.trash-icon, .edit-icon {
+.trash-icon, .edit-icon, .view-icon {
   text-align: center;  
   padding-bottom: 0;
 }

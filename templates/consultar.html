@@ -76,6 +76,9 @@
                 <th>Valor</th>
                 <th>Tags</th>
                 <th>Descrição</th>
+                {% if images %}
+                  <th></th>
+                {% endif %}     
                 <th></th>
                 <th></th>
               </tr>
@@ -89,13 +92,20 @@
                     <div class="tags-1">{{ item["tags"] }}</div>  
                   </td>
                   <td class="description">{{ item["descricao"] }}</td>
+                    {% if images %}
+                    <td class="view-icon">
+                      <a href="/uploads/ {{ item["id"] }}">
+                        <img src="/static/img/view.svg" alt="View Icon">
+                      </a>
+                    </td>
+                    {% endif %}
                   <td class="edit-icon">
-                    <a href="/transacoes/edit/{{ item["id"]}}">
+                    <a href="/transacoes/edit/{{ item["id"] }}">
                       <img src="/static/img/edit.svg" alt="Edit Icon">
                     </a>
                   </td>
                   <td class="trash-icon">
-                    <form method="post" class="trash" action="/transacoes/{{ item["id"]}}/excluir">
+                    <form method="post" class="trash" action="/transacoes/{{ item["id"] }}/excluir">
                       <button type="submit" class="button-trash"> 
                         <img src="/static/img/trash.svg" alt="Trash Icon">
                       </button>

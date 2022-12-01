@@ -1,1 +1,3 @@
 __pycache__
+static/files/*
+!static/files/.gitkeep

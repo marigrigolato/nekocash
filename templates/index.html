@@ -45,7 +45,7 @@
         {% else %}
           <h3 class="section-title">Incluir Transações</h3> 
         {% endif %}  
-          <form method="post">
+          <form method="post" enctype="multipart/form-data">
             <fieldset class="section-group">
               <div class="field">
                 <div class="label-icons">
@@ -76,6 +76,13 @@
               </div>  
               <textarea rows="3" id="description" name="descricao">{{ request.form['descricao'] or transacao['descricao'] }}</textarea>
             </div>
+            <label class="upload">
+              <input type="file" name="file" value="{{ request.form['file'] or transacao['file'] }}">
+              <span id="upload-file">
+                <img src="/static/img/upload.svg" alt="Upload Icon" class="icon">                                   
+              </span>
+              <span id="upload">Choose File</span>
+            </label>                      
             <button type="submit" class="button">Salvar</button>
           </form> 
       </section>

@@ -44,7 +44,7 @@ a {
   padding: 0 1em 0 0;
 }
 
-@media screen and (max-width: 750px) {
+@media screen and (max-width: 950px) {
   .list-menu {
     position: absolute;
     display: none;
