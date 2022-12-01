@@ -1,3 +1,4 @@
+import uuid
 import os
 import psycopg2
 import psycopg2.extras
@@ -41,7 +42,7 @@ def index():
  
     if file and allowed_file(file.filename):
 
-      filename = secure_filename(file.filename)
+      filename = f"{uuid.uuid4()}{secure_filename(file.filename)}"
 
       cursor.execute('''
         insert into images (id_transacao, imgname)
