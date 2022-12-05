@@ -1,8 +1,7 @@
-import uuid
 import os
 import psycopg2
 import psycopg2.extras
-from flask import Flask, redirect, render_template, request, send_from_directory, flash
+from flask import Flask, redirect, render_template, request, flash, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 
 
@@ -31,25 +30,20 @@ def index():
     tags = request.form['tags']
     descricao = request.form['descricao']
     file = request.files['file']
+    
+    filename = secure_filename(file.filename)
 
     cursor.execute('''
-      insert into transacoes (data, valor_em_cent, descricao)
-      values (%s, %s, %s)
+      insert into transacoes (data, valor_em_cent, descricao, imgname)
+      values (%s, %s, %s, %s)
       returning id;   
-    ''', (data, valor, descricao, ))      
+    ''', (data, valor, descricao, filename, ))      
 
-    id_transacao = cursor.fetchone()
+    row = cursor.fetchone()
+    id_transacao = row['id']
  
     if file and allowed_file(file.filename):
-
-      filename = f"{uuid.uuid4()}{secure_filename(file.filename)}"
-
-      cursor.execute('''
-        insert into images (id_transacao, imgname)
-        values (%s, %s)
-      ''', (id_transacao['id'], filename, ))      
-
-      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))
 
     cursor.execute('''
       select id, nome
@@ -75,7 +69,7 @@ def index():
     cursor.execute('''
       insert into transacao_tag (id_transacao, id_tag)
       values (%s, %s); 
-    ''', (id_transacao['id'], id_tag, ))       
+    ''', (id_transacao, id_tag, ))       
 
     connection.commit()
 
@@ -106,14 +100,12 @@ def consultar():
     descricao = request.args.get('descricao', None)  
 
     insert_query = '''
-      select tx.id, to_char(tx.data, 'DD/MM/YYYY'), tx.descricao, tx.valor_em_cent, t.nome tag, i.imgname
+      select tx.id, to_char(tx.data, 'DD/MM/YYYY'), tx.descricao, tx.valor_em_cent, t.nome tag
       from transacoes tx
         inner join transacao_tag tg
           on tx.id = tg.id_transacao
         inner join tags t
-          on t.id = tg.id_tag
-        full outer join images i 
-          on tx.id = i.id_transacao  
+          on t.id = tg.id_tag 
       where 1=1
     '''
 
@@ -158,36 +150,13 @@ def consultar():
         'descricao': registro['descricao']
       })    
 
-    images = []
-
-    for registro in registros:
-      images.append({
-        'imgname': registro['imgname']
-      })    
-
-    # print(images)
-          
-  return render_template('consultar.html', results_tags=results_tags, images=images, transacoes=transacoes, data=data, valor=valor, tags=tags, descricao=descricao)
+  return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, data=data, valor=valor, tags=tags, descricao=descricao)
 
 
 @app.route('/uploads/<id_transacao>', methods=['GET'])
 def download_file(id_transacao):
-
-  conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
-
-  cur = conn.cursor()
-
-  cur.execute('''
-    select imgname
-    from images
-    where id_transacao = %s;
-  ''', (id_transacao, ))
-
-  filename = cur.fetchall()
-  
-  file = [''.join(i) for i in filename] 
-
-  return send_from_directory(app.config["UPLOAD_FOLDER"], file[0])
+  # return send_from_directory(app.config["UPLOAD_FOLDER"], id_transacao, download_name=f"{id_transacao}.pdf")
+  return send_file(os.path.join(f'static/files/', id_transacao), as_attachment=True)
 
 
 @app.route('/transacoes/<int:id_transacao>/excluir', methods=['POST'])
@@ -197,25 +166,17 @@ def delete_transacoes(id_transacao):
 
   cur = conn.cursor()
 
-  cur.execute('''
-    select imgname
-    from images
-    where id_transacao = %s;
-  ''', (id_transacao, ))
-
-  filename = cur.fetchall()
-
-  file = [''.join(i) for i in filename] 
-
-  os.remove(f'static/files/{file[0]}')
+  try:
+    os.remove(f'static/files/{id_transacao}')
+  except FileNotFoundError:
+    pass
 
   delete_query = '''
     delete from transacao_tag where id_transacao = %s;
-    delete from images where id_transacao = %s;
     delete from transacoes where id = %s;
   '''
 
-  cur.execute(delete_query, (id_transacao, id_transacao, id_transacao, ))
+  cur.execute(delete_query, (id_transacao, id_transacao, ))
 
   conn.commit()
 
@@ -231,14 +192,12 @@ def edit_transacoes(id_transacao):
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
   cur.execute('''
-    select tx.id, tx.data, tx.descricao, tx.valor_em_cent, t.nome tag, i.imgname
+    select tx.id, tx.data, tx.descricao, tx.valor_em_cent, t.nome "tag"
     from transacoes tx
       inner join transacao_tag tg
         on tx.id = tg.id_transacao
       inner join tags t
         on t.id = tg.id_tag
-      full outer join images i 
-        on tx.id = i.id_transacao
     where tx.id = %s;
   ''',(id_transacao, ))
 
@@ -249,9 +208,6 @@ def edit_transacoes(id_transacao):
     if registro['id'] == id_transacao:
 
       if request.method == 'POST':
-       
-        name = registro['imgname']
-        os.remove(f'static/files/{name}')
 
         data = request.form['data']
         valor = request.form['valor']
@@ -259,42 +215,41 @@ def edit_transacoes(id_transacao):
         descricao = request.form['descricao']
         file = request.files['file']
 
+        filename = secure_filename(file.filename)
+
         if file and allowed_file(file.filename):
 
-          filename = secure_filename(file.filename)
-  
-          cur.execute('''
-            update images
-            set
-              imgname = %s
-            where id_transacao = %s;
-          ''', (filename, id_transacao, ))      
+          try:
+            os.remove(f'static/files/{id_transacao}')
+          except FileNotFoundError:
+            pass
 
-          file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))   
-                  
-          edit_query = '''
-            update transacoes 
-            set 
-              data = %s,
-              valor_em_cent = %s,
-              descricao = %s 
-            where id = %s;
-            update tags t
-            set
-              nome = %s  
-              where id in (
-                select id_tag
-                from transacao_tag
-                where id_transacao = %s
-              ); 
-          '''
+          file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))                    
 
-          cur.execute(edit_query, (data, valor, descricao, id_transacao, tags, id_transacao, ))
+        edit_query = '''
+          update transacoes 
+          set 
+            data = %s,
+            valor_em_cent = %s,
+            descricao = %s
+            imgname = %s TO AQUI!!!!!
+          where id = %s;
+          update tags t
+          set
+            nome = %s  
+            where id in (
+              select id_tag
+              from transacao_tag
+              where id_transacao = %s
+            ); 
+        '''
 
-          conn.commit()  
+        cur.execute(edit_query, (data, valor, descricao, filename, id_transacao, tags, id_transacao, ))
 
-          flash('Updated successfully!')
-          return redirect('/consultar')
+        conn.commit()  
+
+        flash('Updated successfully!')
+        return redirect('/consultar')
 
       return render_template('index.html', transacao=registro)
 
@@ -307,27 +262,40 @@ def relatorio_tag():
 
   data = request.args.get('data', None)
 
-  nova_data = data.split('-')
+  if data:
+    nova_data = data.split('-')
 
-  cur.execute(''' 
-    select tx.data, tx.valor_em_cent, t.nome tag
-    from transacoes tx
-      inner join transacao_tag tg
-      on tx.id = tg.id_transacao
-      inner join tags t
-      on t.id = tg.id_tag
-    where extract(year FROM (select data)) = (%s)
-      and extract(month FROM (select data)) = (%s)
-  ''',(nova_data[0], nova_data[1], )) 
+    cur.execute(''' 
+      select count(1) "qtd_transacoes", sum(valor_em_cent) "valor_total", t.nome "tag"
+      from transacoes tx
+        inner join transacao_tag tg
+          on tx.id = tg.id_transacao
+        inner join tags t
+          on t.id = tg.id_tag
+      where extract(year FROM (select data)) = (%s)
+        and extract(month FROM (select data)) = (%s)
+      group by t.nome;
+    ''',(nova_data[0], nova_data[1], )) 
 
-  registros = cur.fetchall()
+    registros = cur.fetchall()
 
-  transacoes = []
+    transacoes = []
 
-  for registro in registros:
-    transacoes.append({
-      'valor': registro['valor_em_cent'],
-      'tags': registro['tag'],
-    })   
+    cont_qtd_transacoes = 0
+    cont_valor_total = 0
 
-  return render_template('relatorio.html', transacoes=transacoes, data=data)
+    for registro in registros:
+      transacoes.append({
+        'qtd': registro['qtd_transacoes'],
+        'valor': registro['valor_total'],
+        'tags': registro['tag'],
+      })
+      cont_qtd_transacoes += registro['qtd_transacoes']
+      cont_valor_total += registro['valor_total']
+
+  else:
+    transacoes = None
+    cont_qtd_transacoes = None
+    cont_valor_total = None
+
+  return render_template('relatorio.html', transacoes=transacoes, data=data, cont_qtd_transacoes=cont_qtd_transacoes, cont_valor_total=cont_valor_total)

@@ -39,7 +39,7 @@
     <main>
       <section>
         <h3 class="section-title">Relatório de Tags</h3> 
-        <form>
+        <form method="get">
           <div class="field">
             <div class="label-icons">
               <img src="/static/img/date.svg" alt="Date Icon" class="icon">
@@ -65,15 +65,15 @@
                     <div class="tags-2">{{ item["tags"] }}</div>
                   </td>
                   <td class="money">{{ item["valor"] }}</td>
-                  <td>3</td>                            
+                  <td>{{ item["qtd"] }}</td>                            
                 </tr>
-                <!-- <tr>
-                  <td>TOTAL</td>
-                  <td class="money">{{ item["total"] }}</td>
-                  <td>{{ item["qtd-tag"] }}</td>                            
-                </tr>                         -->
-              </tbody>
             {% endfor %}  
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="money">{{ cont_valor_total }}</td>
+                  <td>{{ cont_qtd_transacoes }}</td>                            
+                </tr>                        
+              </tbody>
           </table> 
         {% endif %}                 
       </section>
