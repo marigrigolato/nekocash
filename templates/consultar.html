@@ -85,7 +85,7 @@
               <tbody>
                 <tr>
                   <td>{{ item.date|date_format }}</td>
-                  <td class="money">{{ item.valor }}</td>
+                  <td class="money">{{ item.valor|format_currency }}</td>
                   <td class="tags">
                     <div class="tags-1">{{ item.tags }}</div>  
                   </td>
