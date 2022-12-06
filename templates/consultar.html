@@ -56,7 +56,7 @@
               <input type="text" name="descricao" id="description" value="{{ descricao or '' }}" placeholder="Descrição"/>
             </div>
             <div class="field">
-              <input type="date" name="data" id="date" value="{{ data or '' }}"/> 
+              <input type="date" name="date" value="{{ date or '' }}"/> 
             </div> 
             <div class="field icon-max">
               <button type="submit" class="button-filter"> 
@@ -84,14 +84,14 @@
             {% for item in transacoes %}                
               <tbody>
                 <tr>
-                  <td>{{ item["data"] }}</td>
-                  <td class="money">{{ item["valor"] }}</td>
+                  <td>{{ item.date|date_format }}</td>
+                  <td class="money">{{ item.valor }}</td>
                   <td class="tags">
-                    <div class="tags-1">{{ item["tags"] }}</div>  
+                    <div class="tags-1">{{ item.tags }}</div>  
                   </td>
-                  <td class="description">{{ item["descricao"] }}</td>
+                  <td class="description">{{ item.descricao }}</td>
                   <td class="download-icon">
-                    {% if item["file"] %}
+                    {% if item.file %}
                       <a href="/uploads/{{ item["id"] }}">
                         <img src="/static/img/download.svg" alt="Download Icon">
                       </a>

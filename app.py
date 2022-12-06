@@ -1,4 +1,5 @@
 import os
+import jinja2  
 import psycopg2
 import psycopg2.extras
 from flask import Flask, redirect, render_template, request, flash, send_from_directory
@@ -15,6 +16,11 @@ def allowed_file(filename):
   return '.' in filename and \
     filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def date_format(value, format='%d-%m-%Y'):
+  return value.strftime(format)
+
+jinja2.filters.FILTERS['date_format'] = date_format 
+   
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -25,7 +31,7 @@ def index():
 
     cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    data = request.form['data']
+    date = request.form['date']
     valor = request.form['valor']
     tags = request.form['tags']
     descricao = request.form['descricao']
@@ -34,10 +40,10 @@ def index():
     filename = secure_filename(file.filename)
 
     cursor.execute('''
-      insert into transacoes (data, valor_em_cent, descricao, imgname)
+      insert into transacoes (date, valor_em_cent, descricao, imgname)
       values (%s, %s, %s, %s)
       returning id;   
-    ''', (data, valor, descricao, filename, ))      
+    ''', (date, valor, descricao, filename, ))      
 
     row = cursor.fetchone()
     id_transacao = row['id']
@@ -94,13 +100,13 @@ def consultar():
   results_tags = cur.fetchall()
 
   if request.method == 'GET':
-    data = request.args.get('data', None)
+    date = request.args.get('date', None)
     valor = request.args.get('valor', None)
     tags = request.args.getlist('tags', None)
     descricao = request.args.get('descricao', None)  
 
     insert_query = '''
-      select tx.id, to_char(tx.data, 'DD/MM/YYYY'), tx.descricao, tx.valor_em_cent, tx.imgname, t.nome tag
+      select tx.id, tx.date, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome tag
       from transacoes tx
         inner join transacao_tag tg
           on tx.id = tg.id_transacao
@@ -111,11 +117,11 @@ def consultar():
 
     parametros = []
 
-    if data:
+    if date:
       insert_query += '''
-        and tx.data = %s
+        and tx.date = %s
       '''
-      parametros.append(data)
+      parametros.append(date)
 
     if valor:
       insert_query += '''
@@ -143,14 +149,14 @@ def consultar():
     for registro in registros:
       transacoes.append({
         'id': registro['id'],
-        'data': registro['to_char'],
+        'date': registro['date'],
         'valor': registro['valor_em_cent'],
         'tags': registro['tag'],
         'descricao': registro['descricao'],
         'file': registro['imgname']
       })    
 
-  return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, data=data, valor=valor, tags=tags, descricao=descricao)
+  return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, date=date, valor=valor, tags=tags, descricao=descricao)
 
 
 @app.route('/uploads/<id_transacao>', methods=['GET'])
@@ -170,7 +176,7 @@ def download_file(id_transacao):
   namefile = row[0]
   file_extension = ''.join(namefile)
 
-  return send_from_directory(app.config["UPLOAD_FOLDER"], id_transacao, download_name=f"{id_transacao}{file_extension}", as_attachment=True)
+  return send_from_directory(app.config['UPLOAD_FOLDER'], id_transacao, download_name=f'{id_transacao}{file_extension}', as_attachment=True)
 
 
 @app.route('/transacoes/<int:id_transacao>/excluir', methods=['POST'])
@@ -206,7 +212,7 @@ def edit_transacoes(id_transacao):
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
   cur.execute('''
-    select tx.id, tx.data, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome "tag"
+    select tx.id, tx.date, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome "tag"
     from transacoes tx
       inner join transacao_tag tg
         on tx.id = tg.id_transacao
@@ -223,7 +229,7 @@ def edit_transacoes(id_transacao):
 
       if request.method == 'POST':
 
-        data = request.form['data']
+        date = request.form['date']
         valor = request.form['valor']
         tags = request.form['tags']
         descricao = request.form['descricao']
@@ -243,7 +249,7 @@ def edit_transacoes(id_transacao):
           edit_query = '''
             update transacoes 
             set 
-              data = %s,
+              date = %s,
               valor_em_cent = %s,
               descricao = %s,
               imgname = %s 
@@ -258,14 +264,14 @@ def edit_transacoes(id_transacao):
               ); 
           '''
 
-          cur.execute(edit_query, (data, valor, descricao, filename, id_transacao, tags, id_transacao, ))
+          cur.execute(edit_query, (date, valor, descricao, filename, id_transacao, tags, id_transacao, ))
 
         else:
 
           edit_query = '''
             update transacoes 
             set 
-              data = %s,
+              date = %s,
               valor_em_cent = %s,
               descricao = %s
             where id = %s;
@@ -279,7 +285,7 @@ def edit_transacoes(id_transacao):
               ); 
           '''
 
-          cur.execute(edit_query, (data, valor, descricao, id_transacao, tags, id_transacao, ))
+          cur.execute(edit_query, (date, valor, descricao, id_transacao, tags, id_transacao, ))
 
         conn.commit()  
 
@@ -296,10 +302,10 @@ def relatorio_tag():
 
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-  data = request.args.get('data', None)
+  date = request.args.get('date', None)
 
-  if data:
-    nova_data = data.split('-')
+  if date:
+    edit_date = date.split('-')
 
     cur.execute(''' 
       select count(1) "qtd_transacoes", sum(valor_em_cent) "valor_total", t.nome "tag"
@@ -308,10 +314,10 @@ def relatorio_tag():
           on tx.id = tg.id_transacao
         inner join tags t
           on t.id = tg.id_tag
-      where extract(year FROM (select data)) = (%s)
-        and extract(month FROM (select data)) = (%s)
+      where extract(year FROM (select date)) = (%s)
+        and extract(month FROM (select date)) = (%s)
       group by t.nome;
-    ''',(nova_data[0], nova_data[1], )) 
+    ''',(edit_date[0], edit_date[1], )) 
 
     registros = cur.fetchall()
 
@@ -334,4 +340,4 @@ def relatorio_tag():
     cont_qtd_transacoes = None
     cont_valor_total = None
 
-  return render_template('relatorio.html', transacoes=transacoes, data=data, cont_qtd_transacoes=cont_qtd_transacoes, cont_valor_total=cont_valor_total)
+  return render_template('relatorio.html', transacoes=transacoes, date=date, cont_qtd_transacoes=cont_qtd_transacoes, cont_valor_total=cont_valor_total)
