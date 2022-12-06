@@ -56,7 +56,7 @@
               <input type="text" name="descricao" id="description" value="{{ descricao or '' }}" placeholder="Descrição"/>
             </div>
             <div class="field">
-              <input type="date" name="data" id="date" value="{{ data or '' }}" placeholder="Data"/> 
+              <input type="date" name="data" id="date" value="{{ data or '' }}"/> 
             </div> 
             <div class="field icon-max">
               <button type="submit" class="button-filter"> 
@@ -90,10 +90,12 @@
                     <div class="tags-1">{{ item["tags"] }}</div>  
                   </td>
                   <td class="description">{{ item["descricao"] }}</td>
-                  <td class="view-icon">
-                    <a href="/uploads/{{ item["id"] }}">
-                      <img src="/static/img/download.svg" alt="View Icon">
-                    </a>
+                  <td class="download-icon">
+                    {% if item["file"] %}
+                      <a href="/uploads/{{ item["id"] }}">
+                        <img src="/static/img/download.svg" alt="Download Icon">
+                      </a>
+                    {% endif %}
                   </td>
                   <td class="edit-icon">
                     <a href="/transacoes/edit/{{ item["id"] }}">

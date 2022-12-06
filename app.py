@@ -1,7 +1,7 @@
 import os
 import psycopg2
 import psycopg2.extras
-from flask import Flask, redirect, render_template, request, flash, send_file, send_from_directory
+from flask import Flask, redirect, render_template, request, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
 
@@ -100,7 +100,7 @@ def consultar():
     descricao = request.args.get('descricao', None)  
 
     insert_query = '''
-      select tx.id, to_char(tx.data, 'DD/MM/YYYY'), tx.descricao, tx.valor_em_cent, t.nome tag
+      select tx.id, to_char(tx.data, 'DD/MM/YYYY'), tx.descricao, tx.valor_em_cent, tx.imgname, t.nome tag
       from transacoes tx
         inner join transacao_tag tg
           on tx.id = tg.id_transacao
@@ -138,7 +138,6 @@ def consultar():
     cur.execute(insert_query, parametros)
     
     registros = cur.fetchall()
-
     transacoes = []
 
     for registro in registros:
@@ -147,7 +146,8 @@ def consultar():
         'data': registro['to_char'],
         'valor': registro['valor_em_cent'],
         'tags': registro['tag'],
-        'descricao': registro['descricao']
+        'descricao': registro['descricao'],
+        'file': registro['imgname']
       })    
 
   return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, data=data, valor=valor, tags=tags, descricao=descricao)
@@ -155,8 +155,22 @@ def consultar():
 
 @app.route('/uploads/<id_transacao>', methods=['GET'])
 def download_file(id_transacao):
-  # return send_from_directory(app.config["UPLOAD_FOLDER"], id_transacao, download_name=f"{id_transacao}.pdf")
-  return send_file(os.path.join(f'static/files/', id_transacao), as_attachment=True)
+
+  conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
+
+  cur = conn.cursor()
+
+  cur.execute('''
+    select imgname
+    from transacoes
+    where id = (%s);
+  ''', (id_transacao, ))
+
+  row = cur.fetchall()
+  namefile = row[0]
+  file_extension = ''.join(namefile)
+
+  return send_from_directory(app.config["UPLOAD_FOLDER"], id_transacao, download_name=f"{id_transacao}{file_extension}", as_attachment=True)
 
 
 @app.route('/transacoes/<int:id_transacao>/excluir', methods=['POST'])
@@ -192,7 +206,7 @@ def edit_transacoes(id_transacao):
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
   cur.execute('''
-    select tx.id, tx.data, tx.descricao, tx.valor_em_cent, t.nome "tag"
+    select tx.id, tx.data, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome "tag"
     from transacoes tx
       inner join transacao_tag tg
         on tx.id = tg.id_transacao
@@ -226,25 +240,46 @@ def edit_transacoes(id_transacao):
 
           file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))                    
 
-        edit_query = '''
-          update transacoes 
-          set 
-            data = %s,
-            valor_em_cent = %s,
-            descricao = %s
-            imgname = %s TO AQUI!!!!!
-          where id = %s;
-          update tags t
-          set
-            nome = %s  
-            where id in (
-              select id_tag
-              from transacao_tag
-              where id_transacao = %s
-            ); 
-        '''
+          edit_query = '''
+            update transacoes 
+            set 
+              data = %s,
+              valor_em_cent = %s,
+              descricao = %s,
+              imgname = %s 
+            where id = %s;
+            update tags t
+            set
+              nome = %s  
+              where id in (
+                select id_tag
+                from transacao_tag
+                where id_transacao = %s
+              ); 
+          '''
 
-        cur.execute(edit_query, (data, valor, descricao, filename, id_transacao, tags, id_transacao, ))
+          cur.execute(edit_query, (data, valor, descricao, filename, id_transacao, tags, id_transacao, ))
+
+        else:
+
+          edit_query = '''
+            update transacoes 
+            set 
+              data = %s,
+              valor_em_cent = %s,
+              descricao = %s
+            where id = %s;
+            update tags t
+            set
+              nome = %s  
+              where id in (
+                select id_tag
+                from transacao_tag
+                where id_transacao = %s
+              ); 
+          '''
+
+          cur.execute(edit_query, (data, valor, descricao, id_transacao, tags, id_transacao, ))
 
         conn.commit()  
 
@@ -252,6 +287,7 @@ def edit_transacoes(id_transacao):
         return redirect('/consultar')
 
       return render_template('index.html', transacao=registro)
+
 
 @app.route('/relatorio', methods=['GET'])
 def relatorio_tag():

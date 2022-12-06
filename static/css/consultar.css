@@ -105,7 +105,7 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   background-color: rgb(237, 237, 237);
 }
 
-.trash-icon, .edit-icon, .view-icon {
+.trash-icon, .edit-icon, .download-icon {
   text-align: center;  
   padding-bottom: 0;
 }
@@ -142,6 +142,12 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
     position: absolute;
     left: 6em;
     top: 0;
+  }
+
+  .download-icon {
+    position: absolute;
+    right: 2.7em;
+    top: 0;        
   }
 
   .edit-icon {
