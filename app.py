@@ -112,7 +112,7 @@ def consultar():
     parametros = []
 
     if data:
-      insert_query += '''registros
+      insert_query += '''
         and tx.data = %s
       '''
       parametros.append(data)
