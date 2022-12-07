@@ -45,7 +45,10 @@
               <img src="/static/img/date.svg" alt="Date Icon" class="icon">
               <label>Mês</label>
             </div>  
-            <input type="month" name="date" value="{{ date or '' }}">
+            <input type="month" name="date" value="{{ date or '' }}" class="{{ 'is-invalid' if date == '' else '' }}">
+            {% if date == "" %}
+              <div class="invalid-feedback">Campo obrigatório</div>
+            {% endif %}  
           </div>           
           <button type="submit" class="button">Gerar</button>
         </form>

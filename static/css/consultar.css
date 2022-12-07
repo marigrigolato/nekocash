@@ -40,6 +40,19 @@
   border-radius: 0.2em;
 }
 
+.is-invalid {
+  border: 1px solid rgba(220,53,69,.5);
+  box-shadow: 0 0 0 0.12rem rgb(220 53 69 / 50%);
+}
+
+.invalid-feedback {
+  width: 100%;
+  margin-top: 0.25em;
+  font-size: 0.8em;
+  font-weight: 300;
+  color: #dc3545;
+}
+
 .search-filter input:focus {
   box-shadow: 0 0 0 0;
   outline: 0;
@@ -190,7 +203,6 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   .search-filter input {
     text-align: center;
     letter-spacing: 0.1em;
-    border-radius: 0.5em;
     width: 100%;
   }
 
