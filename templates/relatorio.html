@@ -62,15 +62,15 @@
               <tbody>
                 <tr>
                   <td class="tags">
-                    <div class="tags-2">{{ item["tags"] }}</div>
+                    <div class="tags-2">{{ item.tags }}</div>
                   </td>
-                  <td class="money">{{ item["valor"] }}</td>
-                  <td>{{ item["qtd"] }}</td>                            
+                  <td class="money">{{ item.valor|format_currency }}</td>
+                  <td>{{ item.qtd }}</td>                            
                 </tr>
             {% endfor %}  
                 <tr>
                   <td>TOTAL</td>
-                  <td class="money">{{ cont_valor_total }}</td>
+                  <td class="money">{{ cont_valor_total|format_currency }}</td>
                   <td>{{ cont_qtd_transacoes }}</td>                            
                 </tr>                        
               </tbody>

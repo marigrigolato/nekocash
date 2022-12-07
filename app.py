@@ -18,8 +18,12 @@ def allowed_file(filename):
 
 def date_format(value, format='%d-%m-%Y'):
   return value.strftime(format)
-
 jinja2.filters.FILTERS['date_format'] = date_format 
+
+
+def format_currency(value):
+  return 'R${:,.2f}'.format(value)
+jinja2.filters.FILTERS['format_currency'] = format_currency   
    
 
 @app.route('/', methods=['GET', 'POST'])
@@ -32,7 +36,7 @@ def index():
     cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     date = request.form['date']
-    valor = request.form['valor']
+    valor = float(request.form['valor'])
     tags = request.form['tags']
     descricao = request.form['descricao']
     file = request.files['file']
@@ -43,7 +47,7 @@ def index():
       insert into transacoes (date, valor_em_cent, descricao, imgname)
       values (%s, %s, %s, %s)
       returning id;   
-    ''', (date, valor, descricao, filename, ))      
+    ''', (date, valor*100, descricao, filename, ))      
 
     row = cursor.fetchone()
     id_transacao = row['id']
@@ -150,7 +154,7 @@ def consultar():
       transacoes.append({
         'id': registro['id'],
         'date': registro['date'],
-        'valor': registro['valor_em_cent'],
+        'valor': registro['valor_em_cent']/100,
         'tags': registro['tag'],
         'descricao': registro['descricao'],
         'file': registro['imgname']
@@ -230,7 +234,7 @@ def edit_transacoes(id_transacao):
       if request.method == 'POST':
 
         date = request.form['date']
-        valor = request.form['valor']
+        valor = float(request.form['valor'])
         tags = request.form['tags']
         descricao = request.form['descricao']
         file = request.files['file']
@@ -264,7 +268,7 @@ def edit_transacoes(id_transacao):
               ); 
           '''
 
-          cur.execute(edit_query, (date, valor, descricao, filename, id_transacao, tags, id_transacao, ))
+          cur.execute(edit_query, (date, valor*100, descricao, filename, id_transacao, tags, id_transacao, ))
 
         else:
 
@@ -285,14 +289,23 @@ def edit_transacoes(id_transacao):
               ); 
           '''
 
-          cur.execute(edit_query, (date, valor, descricao, id_transacao, tags, id_transacao, ))
+          cur.execute(edit_query, (date, valor*100, descricao, id_transacao, tags, id_transacao, ))
 
         conn.commit()  
 
         flash('Updated successfully!')
         return redirect('/consultar')
 
-      return render_template('index.html', transacao=registro)
+      transacao = {
+        'id': registro['id'],
+        'date': registro['date'],
+        'valor': registro['valor_em_cent']/100,
+        'tag': registro['tag'],
+        'descricao': registro['descricao'],
+        'imgname': registro['imgname']
+      }
+
+      return render_template('index.html', transacao=transacao)
 
 
 @app.route('/relatorio', methods=['GET'])
