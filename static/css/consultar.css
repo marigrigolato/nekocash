@@ -202,15 +202,14 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
 
   .search-filter input {
     text-align: center;
-    letter-spacing: 0.1em;
     width: 100%;
   }
 
   .search-filter::after {
-    content: url("../img/filter.svg");
+    content: url("../img/filtermobile.svg");
     position: absolute;
-    right: 0.5em;
-    top: 0.4em;
+    right: 0.8em;
+    top: 0.5em;
   }
 
   .icon-max {
