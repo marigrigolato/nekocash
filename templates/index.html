@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/globalnav.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/consultar.css"/>       
     <link rel="stylesheet" type="text/css" href="/static/css/globalfooter.css"/>
   </head>
   <body>
@@ -52,27 +53,36 @@
                   <img src="/static/img/cifrao.svg" alt="Tags Icon" class="icon cifrao">
                   <label>Valor</label>
                 </div>
-                <input type="text" name="valor" id="valor" value="{{ request.form['valor'] or transacao['valor'] }}"> 
+                <input type="text" name="valor" id="valor" value="{{ request.form['valor'] or transacao['valor'] }}" class="{{ 'is-invalid' if valor == '' else '' }}"> 
+                {% if valor == "" %}
+                  <div class="invalid-feedback">Campo obrigatório</div>
+                {% endif %}  
               </div>
               <div class="field">
                 <div class="label-icons">
                   <img src="/static/img/tags.svg" alt="Tags Icon" class="icon">
                   <label>Tags</label>
                 </div>
-                <input type="text" name="tags" id="tag" value="{{ request.form['tags'] or transacao['tag'] }}">
+                <input type="text" name="tags" id="tag" value="{{ request.form['tags'] or transacao['tag'] }}" class="{{ 'is-invalid' if tags == '' else '' }}">
+                {% if tags == "" %}
+                  <div class="invalid-feedback">Campo obrigatório</div>
+                {% endif %}                 
               </div>
               <div class="field">
                 <div class="label-icons">
                   <img src="/static/img/date.svg" alt="Date Icon" class="icon">
                   <label>Data</label>
                 </div>  
-                <input type="date" name="date" value="{{ request.form['date'] or transacao['date'] }}">
+                <input type="date" name="date" value="{{ request.form['date'] or transacao['date'] }}" class="{{ 'is-invalid' if date == '' else '' }}">
+                {% if date == "" %}
+                  <div class="invalid-feedback">Campo obrigatório</div>
+                {% endif %} 
               </div> 
             </fieldset> 
             <div class="field">
               <div class="label-icons">
                 <img src="/static/img/description.svg" alt="Description Icon" class="icon">
-                <label>Descrição</label>
+                <label>Descrição (Opcional)</label>
               </div>  
               <textarea rows="3" id="description" name="descricao">{{ request.form['descricao'] or transacao['descricao'] }}</textarea>
             </div>

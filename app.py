@@ -55,19 +55,24 @@ jinja2.filters.FILTERS['word_list'] = word_list
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
+  connection = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
+
+  cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
   if request.method == 'POST':
 
-    connection = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
-
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
     date = request.form['date']
-    valor = float(request.form['valor'])
+    valor = request.form['valor']
     tags = request.form['tags']
     descricao = request.form['descricao']
     file = request.files['file']
-    
+
     filename = secure_filename(file.filename)
+    
+    if date == '' or valor == '' or tags == '':
+      return render_template('index.html', transacao={}, date=date, valor=valor, tags=tags)
+
+    valor = float(valor)
 
     cursor.execute('''
       insert into transacoes (date, valor_em_cent, descricao, imgname)
@@ -77,7 +82,7 @@ def index():
 
     row = cursor.fetchone()
     id_transacao = row['id']
- 
+
     if file and allowed_file(file.filename):
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))
 
@@ -106,7 +111,7 @@ def index():
       insert into transacao_tag (id_transacao, id_tag)
       values (%s, %s); 
     ''', (id_transacao, id_tag, ))       
-
+      
     connection.commit()
 
     flash('Transaction created successfully!')
@@ -266,6 +271,9 @@ def edit_transacoes(id_transacao):
         file = request.files['file']
 
         filename = secure_filename(file.filename)
+
+        if date == '' or valor == '' or tags == '':
+          return render_template('index.html', transacao={}, date=date, valor=valor, tags=tags)
 
         if file and allowed_file(file.filename):
 
