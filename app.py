@@ -2,6 +2,7 @@ import os
 import jinja2  
 import psycopg2
 import psycopg2.extras
+from datetime import datetime
 from flask import Flask, redirect, render_template, request, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
@@ -16,15 +17,40 @@ def allowed_file(filename):
   return '.' in filename and \
     filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def date_format(value, format='%d-%m-%Y'):
-  return value.strftime(format)
-jinja2.filters.FILTERS['date_format'] = date_format 
-
-
 def format_currency(value):
   return 'R${:,.2f}'.format(value)
 jinja2.filters.FILTERS['format_currency'] = format_currency   
+
    
+def date_format(value):
+  if isinstance(value, str):
+    if value == '':
+      return ''
+    date_value = datetime.strptime(value, '%Y-%m-%d')
+  else:
+    date_value = value
+  return date_value.strftime("%d/%m/%Y")
+jinja2.filters.FILTERS['date_format'] = date_format 
+
+
+def year_month_format(value):
+  date_value = datetime.strptime(value, '%Y-%m')
+  return date_value.strftime('%B %Y')
+jinja2.filters.FILTERS['year_month_format'] = year_month_format
+
+
+def word_list(value):
+  if len(value) == 0:
+    return ''
+  result = value[0]
+  for index, word in enumerate(value[1:]):
+    if index < len(value) - 2:
+      result += ','
+    else:
+      result += ' e'
+    result += f' {word}'
+  return result
+jinja2.filters.FILTERS['word_list'] = word_list
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

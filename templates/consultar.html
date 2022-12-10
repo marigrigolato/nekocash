@@ -67,7 +67,12 @@
               <input type="submit" value="Aplicar"> 
             </div>
           </fieldset>
-        </form>
+        </form> 
+        {% if transacoes == [] %}
+        <h3 class="empty-filter">Sorry, there are no results for 
+          <span class="text-state-orange">{{ (date | date_format) or valor or (tags | word_list) or descricao }}</span>
+        </h3>
+      {% endif %} 
         {% if transacoes %}
           <table>
             <thead>
@@ -84,8 +89,8 @@
             {% for item in transacoes %}                
               <tbody>
                 <tr>
-                  <td>{{ item.date|date_format }}</td>
-                  <td class="money">{{ item.valor|format_currency }}</td>
+                  <td>{{ item.date | date_format }}</td>
+                  <td class="money">{{ item.valor | format_currency }}</td>
                   <td class="tags">
                     <div class="tags-1">{{ item.tags }}</div>  
                   </td>

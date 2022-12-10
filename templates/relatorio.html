@@ -52,6 +52,11 @@
           </div>           
           <button type="submit" class="button">Gerar</button>
         </form>
+        {% if transacoes == [] %}
+          <h3 class="empty-filter">Sorry, there are no results for 
+            <span class="text-state-orange">{{ date | year_month_format }}</span>
+          </h3>
+        {% endif %} 
         {% if transacoes %}
           <table>
             <thead>
