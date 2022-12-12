@@ -59,6 +59,13 @@ def index():
 
   cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
+  cursor.execute('''
+    select nome
+    from tags;
+  ''')
+
+  results_tags = cursor.fetchall()
+
   if request.method == 'POST':
 
     date = request.form['date']
@@ -117,7 +124,7 @@ def index():
     flash('Transaction created successfully!')
     return redirect('/')
 
-  return render_template('index.html', transacao={})
+  return render_template('index.html', transacao={}, results_tags=results_tags)
 
 
 @app.route('/consultar', methods=['GET'])
