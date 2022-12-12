@@ -17,10 +17,10 @@
   </head>
   <body>
     <header class="header-contents">
-      <a href="/"> 
+      <a href="/">
         <span id="logo">neko<strong>Cash</strong></span>
-      </a>         
-      <nav class="nav-menu">  
+      </a>
+      <nav class="nav-menu">
         <label class="mobile-menu" for="toggle">&#9776;</label>
         <input type="checkbox" id="toggle">
         <ul class="list-menu">
@@ -32,12 +32,12 @@
           </li>
           <li class="item-menu">
             <a href="/relatorio">Relatório de Tags</a>
-          </li>  
-        </ul>  
+          </li>
+        </ul>
       </nav>
     </header>
     <main>
-      <section >    
+      <section >
       {% for message in get_flashed_messages() %}
         <div class="flash">{{ message }}</div>
       {% endfor %}
@@ -50,7 +50,7 @@
                 <div class="invalid-feedback">Valor inválido</div>
               {% endif %}
             </div>
-            <select name="tags" class="field" multiple>              
+            <select name="tags" class="field" multiple>
               {% for tag in results_tags %}
               <option value="{{ tag['nome'] }}">{{tag['nome']}}</option>
               {% endfor %}
@@ -59,23 +59,23 @@
               <input type="text" name="descricao" id="description" value="{{ descricao or '' }}" placeholder="Descrição" autocomplete="off"/>
             </div>
             <div class="field">
-              <input type="date" name="date" value="{{ date or '' }}"/> 
-            </div> 
+              <input type="date" name="date" value="{{ date or '' }}"/>
+            </div>
             <div class="field icon-max">
-              <button type="submit" class="button-filter"> 
-                <img src="/static/img/filter.svg" alt="Filter Icon"> 
+              <button type="submit" class="button-filter">
+                <img src="/static/img/filter.svg" alt="Filter Icon">
               </button>
-            </div>         
+            </div>
             <div class="search-filter">
-              <input type="submit" value="Aplicar"> 
+              <input type="submit" value="Aplicar">
             </div>
           </fieldset>
-        </form> 
+        </form>
         {% if transacoes == [] %}
-        <h3 class="empty-filter">Sorry, there are no results for 
+        <h3 class="empty-filter">Sorry, there are no results for
           <span class="text-state-orange">{{ (date | date_format) or (valor | format_currency) or (tags | word_list) or descricao }}</span>
         </h3>
-      {% endif %} 
+      {% endif %}
         {% if transacoes %}
           <table>
             <thead>
@@ -84,18 +84,18 @@
                 <th>Valor</th>
                 <th>Tags</th>
                 <th>Descrição</th>
-                <th></th>   
+                <th></th>
                 <th></th>
                 <th></th>
               </tr>
             </thead>
-            {% for item in transacoes %}                
+            {% for item in transacoes %}
               <tbody>
                 <tr>
                   <td>{{ item.date | date_format }}</td>
                   <td class="money">{{ item.valor | format_currency }}</td>
                   <td class="tags">
-                    <div class="tags-1">{{ item.tags }}</div>  
+                    <div class="tags-1">{{ item.tags }}</div>
                   </td>
                   <td class="description">{{ item.descricao }}</td>
                   <td class="download-icon">
@@ -112,7 +112,7 @@
                   </td>
                   <td class="trash-icon">
                     <form method="post" class="trash" action="/transacoes/{{ item["id"] }}/excluir">
-                      <button type="submit" class="button-trash"> 
+                      <button type="submit" class="button-trash">
                         <img src="/static/img/trash.svg" alt="Trash Icon">
                       </button>
                     </form>
@@ -161,8 +161,8 @@
               </li>
             </ul>
           </div>
-        </div>  
-      </div>  
+        </div>
+      </div>
     </footer>
   </body>
 </html>

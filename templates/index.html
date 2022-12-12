@@ -12,14 +12,14 @@
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/globalnav.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/consultar.css"/>       
+    <link rel="stylesheet" type="text/css" href="/static/css/consultar.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/globalfooter.css"/>
   </head>
   <body>
     <header class="header-contents">
-      <a id="logo" href="/"> 
+      <a id="logo" href="/">
         <span>neko<strong>Cash</strong></span>
-      </a>            
+      </a>
       <nav class="nav-menu">
         <label class="mobile-menu" for="toggle">&#9776;</label>
         <input type="checkbox" id="toggle">
@@ -32,20 +32,20 @@
           </li>
           <li class="item-menu">
             <a href="/relatorio">Relatório de Tags</a>
-          </li>  
-        </ul>  
+          </li>
+        </ul>
       </nav>
     </header>
     <main>
       <section>
         {% for message in get_flashed_messages() %}
           <div class="flash">{{ message }}</div>
-        {% endfor %}        
+        {% endfor %}
         {% if transacao %}
           <h3 class="section-title">Editar Transações</h3>
         {% else %}
-          <h3 class="section-title">Incluir Transações</h3> 
-        {% endif %}  
+          <h3 class="section-title">Incluir Transações</h3>
+        {% endif %}
           <form method="post" enctype="multipart/form-data">
             <fieldset class="section-group">
               <div class="field">
@@ -53,12 +53,12 @@
                   <img src="/static/img/cifrao.svg" alt="Tags Icon" class="icon cifrao">
                   <label>Valor</label>
                 </div>
-                <input type="text" name="valor" id="valor" value="{{ request.form['valor'] or transacao['valor'] }}" class="{{ 'is-invalid' if valor == '' or valor == False else '' }}" autocomplete="off"> 
+                <input type="text" name="valor" id="valor" value="{{ request.form['valor'] or transacao['valor'] }}" class="{{ 'is-invalid' if valor == '' or valor == False else '' }}" autocomplete="off">
                 {% if valor == "" %}
                   <div class="invalid-feedback">Campo obrigatório</div>
                 {% elif valor == False %}
                   <div class="invalid-feedback">O campo valor não pode conter letras</div>
-                {% endif %}  
+                {% endif %}
               </div>
               <div class="field">
                 <div class="label-icons">
@@ -73,37 +73,37 @@
                 </datalist>
                 {% if tags == "" %}
                   <div class="invalid-feedback">Campo obrigatório</div>
-                {% endif %}                 
+                {% endif %}
               </div>
               <div class="field">
                 <div class="label-icons">
                   <img src="/static/img/date.svg" alt="Date Icon" class="icon">
                   <label>Data</label>
-                </div>  
+                </div>
                 <input type="date" name="date" value="{{ request.form['date'] or transacao['date'] }}" class="{{ 'is-invalid' if date == '' else '' }}">
                 {% if date == "" %}
                   <div class="invalid-feedback">Campo obrigatório</div>
-                {% endif %} 
-              </div> 
-            </fieldset> 
+                {% endif %}
+              </div>
+            </fieldset>
             <div class="field">
               <div class="label-icons">
                 <img src="/static/img/description.svg" alt="Description Icon" class="icon">
                 <label>Descrição (Opcional)</label>
-              </div>  
+              </div>
               <textarea rows="3" id="description" name="descricao">{{ request.form['descricao'] or transacao['descricao'] }}</textarea>
             </div>
             <label class="upload">
               <input type="file" name="file" value="{{ request.form['file'] or transacao['file'] }}">
               <span id="upload-file">
-                <img src="/static/img/upload.svg" alt="Upload Icon" class="icon">                                   
+                <img src="/static/img/upload.svg" alt="Upload Icon" class="icon">
               </span>
               <span id="upload">Choose File</span>
-            </label>                      
+            </label>
             <button type="submit" class="button">Salvar</button>
-          </form> 
+          </form>
       </section>
-    </main>  
+    </main>
     <footer>
       <div class="footer-column">
         <img src="/static/img/neko.svg" alt="neko Image" class="neko-image">
@@ -141,7 +141,7 @@
               </li>
             </ul>
           </div>
-        </div>  
+        </div>
       </div>
     </footer>
   </body>
