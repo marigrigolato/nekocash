@@ -275,7 +275,7 @@ def edit_transacoes(id_transacao):
       if request.method == 'POST':
 
         date = request.form['date']
-        valor = float(request.form['valor'])
+        valor = request.form['valor']
         tags = request.form['tags']
         descricao = request.form['descricao']
         file = request.files['file']
@@ -284,6 +284,11 @@ def edit_transacoes(id_transacao):
 
         if date == '' or valor == '' or tags == '':
           return render_template('index.html', transacao={}, date=date, valor=valor, tags=tags)
+
+        if not valor.replace('.', '').isdigit():
+          return render_template('index.html', transacao={}, valor=False)
+
+        valor = float(valor)
 
         if file and allowed_file(file.filename):
 
