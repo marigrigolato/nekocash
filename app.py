@@ -301,6 +301,35 @@ def edit_transacoes(id_transacao):
 
         valor = float(valor)
 
+        cur.execute('''
+          select id, nome
+          from tags
+          where nome = (%s);
+        ''', (tags, ))
+
+        results = cur.fetchall()
+
+        if results == []:
+
+          cur.execute('''
+            insert into tags (nome)
+            values (%s)
+            returning id;
+          ''', (tags, ))
+
+          tag_row = cur.fetchone()
+
+        else:
+          tag_row = results[0]
+
+        id_tag = tag_row['id']
+        cur.execute('''
+          update transacao_tag
+          set
+            id_tag = %s
+            where id_transacao = %s
+        ''', (id_tag, id_transacao, ))
+
         if file and allowed_file(file.filename):
 
           try:
@@ -310,46 +339,26 @@ def edit_transacoes(id_transacao):
 
           file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))                    
 
-          edit_query = '''
+          cur.execute('''
             update transacoes 
             set 
               date = %s,
               valor_em_cent = %s,
               descricao = %s,
               imgname = %s 
-            where id = %s;
-            update tags t
-            set
-              nome = %s  
-              where id in (
-                select id_tag
-                from transacao_tag
-                where id_transacao = %s
-              ); 
-          '''
-
-          cur.execute(edit_query, (date, valor*100, descricao, filename, id_transacao, tags, id_transacao, ))
+            where id = %s
+          ''', (date, valor*100, descricao, filename, id_transacao, ))
 
         else:
 
-          edit_query = '''
+          cur.execute('''
             update transacoes 
             set 
               date = %s,
               valor_em_cent = %s,
               descricao = %s
-            where id = %s;
-            update tags t
-            set
-              nome = %s  
-              where id in (
-                select id_tag
-                from transacao_tag
-                where id_transacao = %s
-              ); 
-          '''
-
-          cur.execute(edit_query, (date, valor*100, descricao, id_transacao, tags, id_transacao, ))
+            where id = %s
+          ''', (date, valor*100, descricao, id_transacao, ))
 
         conn.commit()  
 
