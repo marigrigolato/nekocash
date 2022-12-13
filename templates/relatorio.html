@@ -73,13 +73,15 @@
                     <div class="tags-2">{{ item.tags }}</div>
                   </td>
                   <td class="money">{{ item.valor|format_currency }}</td>
-                  <td>{{ item.qtd }}</td>                            
+                  <td class="format-qtd">{{ item.qtd }}</td>
+                  <td class="small-format-qtd">{{ item.qtd | string_format }}</td>                            
                 </tr>
             {% endfor %}  
                 <tr>
                   <td>TOTAL</td>
                   <td class="money">{{ cont_valor_total|format_currency }}</td>
-                  <td>{{ cont_qtd_transacoes }}</td>                            
+                  <td class="format-qtd">{{ cont_qtd_transacoes }}</td>                            
+                  <td class="small-format-qtd">{{ cont_qtd_transacoes | string_format }}</td>
                 </tr>                        
               </tbody>
           </table> 

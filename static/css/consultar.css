@@ -132,6 +132,10 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   background-color: rgb(237, 237, 237);
 }
 
+.small-format-qtd {
+  display: none;
+}
+
 .trash-icon, .edit-icon, .download-icon {
   text-align: center;  
   padding-bottom: 0;
@@ -163,6 +167,14 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
 
   tbody tr {
     position: relative;
+  }
+
+  .format-qtd {
+    display: none;
+  }
+
+  .small-format-qtd {
+    display: block;
   }
 
   .description {
