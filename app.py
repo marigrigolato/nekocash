@@ -79,6 +79,9 @@ def index():
     if date == '' or valor == '' or tags == '':
       return render_template('index.html', transacao={}, date=date, valor=valor, tags=tags)
 
+    if not valor.replace('.', '').isdigit():
+      return render_template('index.html', transacao={}, valor=False)
+
     valor = float(valor)
 
     cursor.execute('''

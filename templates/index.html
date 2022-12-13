@@ -53,9 +53,11 @@
                   <img src="/static/img/cifrao.svg" alt="Tags Icon" class="icon cifrao">
                   <label>Valor</label>
                 </div>
-                <input type="text" name="valor" id="valor" value="{{ request.form['valor'] or transacao['valor'] }}" class="{{ 'is-invalid' if valor == '' else '' }}" autocomplete="off"> 
+                <input type="text" name="valor" id="valor" value="{{ request.form['valor'] or transacao['valor'] }}" class="{{ 'is-invalid' if valor == '' or valor == False else '' }}" autocomplete="off"> 
                 {% if valor == "" %}
                   <div class="invalid-feedback">Campo obrigatório</div>
+                {% elif valor == False %}
+                  <div class="invalid-feedback">O campo valor não pode conter letras</div>
                 {% endif %}  
               </div>
               <div class="field">
