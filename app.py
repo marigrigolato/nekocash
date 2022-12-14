@@ -180,10 +180,12 @@ def consultar():
       if not valor.replace('.', '').isdigit():
         return render_template('consultar.html', results_tags=results_tags, results=False, date=date, valor=valor, tags=tags, descricao=descricao)
       else:
+        valor = float(valor)
+        valor_em_cent = round(valor * 100)
         insert_query += '''
           and tx.valor_em_cent = %s
         '''
-        parametros.append(valor)
+        parametros.append(valor_em_cent)
 
     if tags:
       insert_query += '''
