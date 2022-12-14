@@ -169,10 +169,13 @@ def consultar():
       parametros.append(date)
 
     if valor:
-      insert_query += '''
-        and tx.valor_em_cent = %s
-      '''
-      parametros.append(valor)
+      if not valor.replace('.', '').isdigit():
+        return render_template('consultar.html', results_tags=results_tags, results=False, date=date, valor=valor, tags=tags, descricao=descricao)
+      else:
+        insert_query += '''
+          and tx.valor_em_cent = %s
+        '''
+        parametros.append(valor)
 
     if tags:
       insert_query += '''
