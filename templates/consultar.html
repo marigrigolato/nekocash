@@ -45,7 +45,10 @@
         <form method="get">
           <fieldset class="section-group">
             <div class="field">
-              <input type="text" name="valor" id="valor" value="{{ valor or '' }}" placeholder="Valor"/> 
+              <input type="text" name="valor" id="valor" value="{{ valor or '' }}" placeholder="Valor" class="{{ 'is-invalid' if results == False else '' }}"/>
+              {% if results == False %}
+                <div class="invalid-feedback">Valor inválido</div>
+              {% endif %}
             </div>
             <select name="tags" class="field" multiple>              
               {% for tag in results_tags %}

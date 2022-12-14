@@ -79,6 +79,9 @@ def index():
     if date == '' or valor == '' or tags == '':
       return render_template('index.html', transacao={}, date=date, valor=valor, tags=tags)
 
+    if not valor.replace('.', '').isdigit():
+      return render_template('index.html', transacao={}, valor=False)
+
     valor = float(valor)
 
     cursor.execute('''
@@ -166,10 +169,13 @@ def consultar():
       parametros.append(date)
 
     if valor:
-      insert_query += '''
-        and tx.valor_em_cent = %s
-      '''
-      parametros.append(valor)
+      if not valor.replace('.', '').isdigit():
+        return render_template('consultar.html', results_tags=results_tags, results=False, date=date, valor=valor, tags=tags, descricao=descricao)
+      else:
+        insert_query += '''
+          and tx.valor_em_cent = %s
+        '''
+        parametros.append(valor)
 
     if tags:
       insert_query += '''
@@ -272,7 +278,7 @@ def edit_transacoes(id_transacao):
       if request.method == 'POST':
 
         date = request.form['date']
-        valor = float(request.form['valor'])
+        valor = request.form['valor']
         tags = request.form['tags']
         descricao = request.form['descricao']
         file = request.files['file']
@@ -281,6 +287,11 @@ def edit_transacoes(id_transacao):
 
         if date == '' or valor == '' or tags == '':
           return render_template('index.html', transacao={}, date=date, valor=valor, tags=tags)
+
+        if not valor.replace('.', '').isdigit():
+          return render_template('index.html', transacao={}, valor=False)
+
+        valor = float(valor)
 
         if file and allowed_file(file.filename):
 
