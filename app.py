@@ -21,14 +21,14 @@ def format_currency(value):
   return 'R${:,.2f}'.format(value)
 jinja2.filters.FILTERS['format_currency'] = format_currency   
 
-def string_format(value):
+def txs_unit_suffix(value):
   word = ' tx'
   if value > 1:
     word += 's'
   else:
     word += ''
   return f'{value}{word}'
-jinja2.filters.FILTERS['string_format'] = string_format
+jinja2.filters.FILTERS['txs_unit_suffix'] = txs_unit_suffix
    
 def date_format(value):
   if isinstance(value, str):
