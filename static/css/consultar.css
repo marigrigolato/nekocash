@@ -100,7 +100,7 @@ table thead tr th {
   padding: 0.5em 0.5em;
   letter-spacing: 0.1em;
   font-weight: 500;
-  text-align: center;  
+  text-align: center;
   color: rgb(255, 255, 255);
   border: 0 solid rgb(0, 0, 0);
   border-bottom-width: 1px;
@@ -125,7 +125,7 @@ table tbody tr td {
 }
 
 tbody > tr:nth-of-type(odd) { /*linhas impar*/
-  background-color: rgb(220, 220, 220);;
+  background-color: rgb(220, 220, 220);
 }
 
 tbody > tr:nth-of-type(even) { /*linhas pares*/
@@ -137,7 +137,7 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
 }
 
 .trash-icon, .edit-icon, .download-icon {
-  text-align: center;  
+  text-align: center;
   padding-bottom: 0;
 }
 
@@ -186,13 +186,13 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   .download-icon {
     position: absolute;
     right: 2.7em;
-    top: 0;        
+    top: 0;
   }
 
   .edit-icon {
     position: absolute;
     right: 1.3em;
-    top: 0;    
+    top: 0;
   }
 
   .trash-icon {
@@ -219,7 +219,7 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   
   .search-filter {
     display: flex;
-    position: relative; 
+    position: relative;
   }
 
   .search-filter input {
@@ -241,6 +241,7 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
 }
 
 @media (max-width: 370px) {
+
   .description {
     position: static;
     left: 0;
@@ -248,4 +249,3 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
   }
 
 }
-

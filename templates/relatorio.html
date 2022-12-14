@@ -12,14 +12,14 @@
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/globalnav.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/consultar.css"/>      
+    <link rel="stylesheet" type="text/css" href="/static/css/consultar.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/globalfooter.css"/>
   </head>
   <body>
     <header>
-      <a id="logo" href="/"> 
+      <a id="logo" href="/">
         <span>neko<strong>Cash</strong></span>
-      </a>            
+      </a>
       <nav class="nav-menu">
         <label class="mobile-menu" for="toggle">&#9776;</label>
         <input type="checkbox" id="toggle">
@@ -31,14 +31,14 @@
             <a href="/consultar">Consultar Transações</a>
           </li>
           <li class="item-menu">
-            <a href="/relatorio">Relatório de Tags</a>            
-          </li>  
-        </ul>  
+            <a href="/relatorio">Relatório de Tags</a>
+          </li>
+        </ul>
       </nav>
     </header>
     <main>
       <section>
-        <h3 class="section-title">Relatório de Tags</h3> 
+        <h3 class="section-title">Relatório de Tags</h3>
         <form method="get">
           <div class="field">
             <div class="label-icons">
@@ -48,25 +48,25 @@
             <input type="month" name="date" value="{{ date or '' }}" class="{{ 'is-invalid' if date == '' else '' }}">
             {% if date == "" %}
               <div class="invalid-feedback">Campo obrigatório</div>
-            {% endif %}  
-          </div>           
+            {% endif %}
+          </div>
           <button type="submit" class="button">Gerar</button>
         </form>
         {% if transacoes == [] %}
-          <h3 class="empty-filter">Sorry, there are no results for 
+          <h3 class="empty-filter">Sorry, there are no results for
             <span class="text-state-orange">{{ date | year_month_format }}</span>
           </h3>
-        {% endif %} 
+        {% endif %}
         {% if transacoes %}
           <table>
             <thead>
               <tr>
                 <th>Tag</th>
                 <th>Valor</th>
-                <th class="small-column">Qtd. Txs.</th>                            
+                <th class="small-column">Qtd. Txs.</th>
               </tr>
             </thead>
-            {% for item in transacoes %}  
+            {% for item in transacoes %}
               <tbody>
                 <tr>
                   <td class="tags">
@@ -74,18 +74,18 @@
                   </td>
                   <td class="money">{{ item.valor|format_currency }}</td>
                   <td class="format-qtd">{{ item.qtd }}</td>
-                  <td class="small-format-qtd">{{ item.qtd | txs_unit_suffix }}</td>                            
+                  <td class="small-format-qtd">{{ item.qtd | txs_unit_suffix }}</td>
                 </tr>
-            {% endfor %}  
+            {% endfor %}
                 <tr>
                   <td>TOTAL</td>
                   <td class="money">{{ cont_valor_total|format_currency }}</td>
-                  <td class="format-qtd">{{ cont_qtd_transacoes }}</td>                            
+                  <td class="format-qtd">{{ cont_qtd_transacoes }}</td>
                   <td class="small-format-qtd">{{ cont_qtd_transacoes | txs_unit_suffix }}</td>
-                </tr>                        
+                </tr>
               </tbody>
           </table> 
-        {% endif %}                 
+        {% endif %}
       </section>
     </main>
     <footer>
@@ -125,8 +125,8 @@
               </li>
             </ul>
           </div>
-        </div>  
+        </div>
       </div>
-    </footer>  
-  </body>  
+    </footer>
+  </body>
 </html>

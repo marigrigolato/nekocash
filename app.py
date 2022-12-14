@@ -1,5 +1,5 @@
 import os
-import jinja2  
+import jinja2
 import psycopg2
 import psycopg2.extras
 from datetime import datetime
@@ -19,7 +19,8 @@ def allowed_file(filename):
 
 def format_currency(value):
   return 'R${:,.2f}'.format(value)
-jinja2.filters.FILTERS['format_currency'] = format_currency   
+jinja2.filters.FILTERS['format_currency'] = format_currency
+
 
 def txs_unit_suffix(value):
   word = ' tx'
@@ -29,7 +30,8 @@ def txs_unit_suffix(value):
     word += ''
   return f'{value}{word}'
 jinja2.filters.FILTERS['txs_unit_suffix'] = txs_unit_suffix
-   
+
+
 def date_format(value):
   if isinstance(value, str):
     if value == '':
@@ -38,7 +40,7 @@ def date_format(value):
   else:
     date_value = value
   return date_value.strftime("%d/%m/%Y")
-jinja2.filters.FILTERS['date_format'] = date_format 
+jinja2.filters.FILTERS['date_format'] = date_format
 
 
 def year_month_format(value):
@@ -95,8 +97,8 @@ def index():
     cursor.execute('''
       insert into transacoes (date, valor_em_cent, descricao, imgname)
       values (%s, %s, %s, %s)
-      returning id;   
-    ''', (date, valor*100, descricao, filename, ))      
+      returning id;
+    ''', (date, valor*100, descricao, filename, ))
 
     row = cursor.fetchone()
     id_transacao = row['id']
@@ -106,18 +108,18 @@ def index():
 
     cursor.execute('''
       select id, nome
-      from tags  
+      from tags
       where nome = (%s);
     ''', (tags, ))
 
     results = cursor.fetchall()
 
-    if results == []: 
+    if results == []:
 
       cursor.execute('''
         insert into tags (nome)
         values (%s)
-        returning id;   
+        returning id;
       ''', (tags, ))
 
       tag_row = cursor.fetchone()
@@ -128,7 +130,7 @@ def index():
     cursor.execute('''
       insert into transacao_tag (id_transacao, id_tag)
       values (%s, %s); 
-    ''', (id_transacao, id_tag, ))       
+    ''', (id_transacao, id_tag, ))
       
     connection.commit()
 
@@ -156,7 +158,7 @@ def consultar():
     date = request.args.get('date', None)
     valor = request.args.get('valor', None)
     tags = request.args.getlist('tags', None)
-    descricao = request.args.get('descricao', None)  
+    descricao = request.args.get('descricao', None)
 
     insert_query = '''
       select tx.id, tx.date, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome tag
@@ -212,7 +214,7 @@ def consultar():
         'tags': registro['tag'],
         'descricao': registro['descricao'],
         'file': registro['imgname']
-      })    
+      })
 
   return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, date=date, valor=valor, tags=tags, descricao=descricao)
 
@@ -339,10 +341,10 @@ def edit_transacoes(id_transacao):
           except FileNotFoundError:
             pass
 
-          file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))                    
+          file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))
 
           cur.execute('''
-            update transacoes 
+            update transacoes
             set 
               date = %s,
               valor_em_cent = %s,
@@ -354,7 +356,7 @@ def edit_transacoes(id_transacao):
         else:
 
           cur.execute('''
-            update transacoes 
+            update transacoes
             set 
               date = %s,
               valor_em_cent = %s,
@@ -362,7 +364,7 @@ def edit_transacoes(id_transacao):
             where id = %s
           ''', (date, valor*100, descricao, id_transacao, ))
 
-        conn.commit()  
+        conn.commit()
 
         flash('Updated successfully!')
         return redirect('/consultar')
@@ -382,7 +384,7 @@ def edit_transacoes(id_transacao):
 @app.route('/relatorio', methods=['GET'])
 def relatorio_tag():
 
-  conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432') 
+  conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -391,7 +393,7 @@ def relatorio_tag():
   if date:
     edit_date = date.split('-')
 
-    cur.execute(''' 
+    cur.execute('''
       select count(1) "qtd_transacoes", sum(valor_em_cent) "valor_total", t.nome "tag"
       from transacoes tx
         inner join transacao_tag tg
@@ -401,7 +403,7 @@ def relatorio_tag():
       where extract(year FROM (select date)) = (%s)
         and extract(month FROM (select date)) = (%s)
       group by t.nome;
-    ''',(edit_date[0], edit_date[1], )) 
+    ''',(edit_date[0], edit_date[1], ))
 
     registros = cur.fetchall()
 
