@@ -402,11 +402,11 @@ def relatorio_tag():
     for registro in registros:
       transacoes.append({
         'qtd': registro['qtd_transacoes'],
-        'valor': registro['valor_total'],
+        'valor': registro['valor_total']/100,
         'tags': registro['tag'],
       })
       cont_qtd_transacoes += registro['qtd_transacoes']
-      cont_valor_total += registro['valor_total']
+      cont_valor_total += registro['valor_total']/100
 
   else:
     transacoes = None
