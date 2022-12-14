@@ -241,6 +241,7 @@ tbody > tr:nth-of-type(even) { /*linhas pares*/
 }
 
 @media (max-width: 370px) {
+
   .description {
     position: static;
     left: 0;
