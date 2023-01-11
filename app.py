@@ -62,6 +62,13 @@ def word_list(value):
   return result
 jinja2.filters.FILTERS['word_list'] = word_list
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+  return render_template('login.html')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
