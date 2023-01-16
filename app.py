@@ -4,7 +4,6 @@ import psycopg2
 import psycopg2.extras
 from datetime import datetime
 from flask import Flask, redirect, render_template, request, flash, send_from_directory, session
-# from flask_session import Session
 from werkzeug.utils import secure_filename
 
 
@@ -13,9 +12,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'some random string'
 app.config['UPLOAD_FOLDER'] = 'static/files'
-# app.config["SESSION_PERMANENT"] = False
-# app.config["SESSION_TYPE"] = "filesystem"
-# Session(app)
+
 
 def allowed_file(filename):
   return '.' in filename and \
@@ -87,24 +84,29 @@ def login():
     if username == '' or password == '':
       return render_template('login.html', username=username, password=password)
 
-    try:
-      cursor.execute ('''
-        select id, password
-        from users
-        where email = (%s);
-      ''', (username, ))
-    
-      row = cursor.fetchall()[0]
-      id_user = row['id']
+    # try:
+    cursor.execute ('''
+      select id, password
+      from users
+      where email = (%s);
+    ''', (username, ))
 
-      if row['password'] == password:
-        session['id'] = id_user
-        return redirect('/')
-      else:
-        return render_template('login.html', password=None)
+    row = cursor.fetchone()
 
-    except:
-      return render_template('login.html', username=None, password=None)
+    if row is None:
+      # user not found
+      return render_template('login.html', usernameError='E-mail não cadastrado')
+
+    id_user = row['id']
+
+    if row['password'] == password:
+      session['id'] = id_user
+      return redirect('/')
+    else:
+      return render_template('login.html', passwordError='Senha inválida')
+
+    # except:
+    #   return render_template('login.html', username=None, password=None)
 
   return render_template('login.html')
 
@@ -218,7 +220,7 @@ def consultar():
         on t.id = tg.id_tag
       inner join users u
         on u.id = tx.id_user and tx.id_user = (%s)
-		group by t.nome
+    group by t.nome
   ''', (session.get('id'), ))
 
   results_tags = cur.fetchall()
@@ -294,18 +296,6 @@ def consultar():
         transacoes = []
       else:
         transacoes = None
-
-  # parametros_de_filtro = ???
-
-  # teste = carregar_transacoes_do_usuario(parametros_de_filtro)
-  # ao_menos_um_registro = len(teste) > 0
-
-  # if ao_menos_um_registro:
-  #   estado = "ao_menos_um_registro"
-  # elif parametros_de_filtro.ao_menos_um_preenchido():
-  #   estado = "sem_registros_com_filtro_aplicado"
-  # else:
-  #   estado = "sem_registros_sem_filtro"
 
   return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, date=date, valor=valor, tags=tags, descricao=descricao)
 

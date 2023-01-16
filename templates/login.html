@@ -15,14 +15,23 @@
         <form action="/login" method="post">
           <div class="field">
             <label>Email</label>
-            <input name="username" type="text" value="{{ request.form['username'] }}" class="{{ 'is-invalid' if username == '' or username == None }}" autocomplete="off">
-            {% if username == '' or username == None %}
-              <div class="invalid-feedback">E-mail inválido</div>
+            <input name="username" type="text" value="{{ request.form['username'] }}" class="{{ 'is-invalid' if username == '' or usernameError }}" autocomplete="off">
+            {% if username == '' %}
+              <div class="invalid-feedback">E-mail obrigatório</div>
+            {% endif %}
+            {% if usernameError %}
+              <div class="invalid-feedback">{{ usernameError }}</div>
             {% endif %}
           </div>
           <div class="field">
             <label>Password</label>
-            <input name="password" type="text" value="{{ request.form['password'] }}" class="{{ 'is-invalid' if password == '' or password == None }}" autocomplete="off">
+            <input name="password" type="password" value="{{ request.form['password'] }}" class="{{ 'is-invalid' if password == '' or passwordError }}" autocomplete="off">
+            {% if password == '' %}
+              <div class="invalid-feedback">Senha obrigatória</div>
+            {% endif %}
+            {% if passwordError %}
+              <div class="invalid-feedback">{{ passwordError }}</div>
+            {% endif %}
           </div>
           <button type="submit">SIGN IN</button>
         </form>

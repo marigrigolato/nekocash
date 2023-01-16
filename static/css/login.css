@@ -46,7 +46,8 @@ label {
   margin-bottom: 1em;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="password"] {
   padding: 0.375em 0.75em;
   box-sizing: border-box;
   align-items: center;
