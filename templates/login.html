@@ -6,19 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,500;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/static/css/login.css"/>
   </head>
   <body>
     <main>
       <section>
-        <form>
+        <form action="/login" method="post">
           <div class="field">
-            <label>Enter Email</label>
-            <input name="user-email" type="text" value="" autocomplete="off">
+            <label>Email</label>
+            <input name="username" type="text" value="{{ request.form['username'] }}" class="{{ 'is-invalid' if username == '' or username == None }}" autocomplete="off">
+            {% if username == '' or username == None %}
+              <div class="invalid-feedback">E-mail inválido</div>
+            {% endif %}
           </div>
           <div class="field">
-            <label>Enter Password</label>
-            <input name="password" type="text" value="" autocomplete="off">
+            <label>Password</label>
+            <input name="password" type="text" value="{{ request.form['password'] }}" class="{{ 'is-invalid' if password == '' or password == None }}" autocomplete="off">
           </div>
           <button type="submit">SIGN IN</button>
         </form>

@@ -51,8 +51,8 @@
 }
 
 .is-invalid {
-  border: 1px solid rgba(220,53,69,.5);
-  box-shadow: 0 0 0 0.12rem rgb(220 53 69 / 50%);
+  border: 1px solid rgba(220,53,69,.5)!important;
+  box-shadow: 0 0 0 0.12rem rgb(220 53 69 / 50%)!important;
 }
 
 .invalid-feedback {

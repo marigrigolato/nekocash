@@ -3,7 +3,8 @@ import jinja2
 import psycopg2
 import psycopg2.extras
 from datetime import datetime
-from flask import Flask, redirect, render_template, request, flash, send_from_directory
+from flask import Flask, redirect, render_template, request, flash, send_from_directory, session
+# from flask_session import Session
 from werkzeug.utils import secure_filename
 
 
@@ -12,12 +13,19 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'some random string'
 app.config['UPLOAD_FOLDER'] = 'static/files'
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+# Session(app)
 
 def allowed_file(filename):
   return '.' in filename and \
     filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def format_currency(value):
+  if value is None:
+    return ''
+  if value == '':
+    return ''
   return 'R${:,.2f}'.format(value)
 jinja2.filters.FILTERS['format_currency'] = format_currency
 
@@ -33,6 +41,8 @@ jinja2.filters.FILTERS['txs_unit_suffix'] = txs_unit_suffix
 
 
 def date_format(value):
+  if value is None:
+    return ''
   if isinstance(value, str):
     if value == '':
       return ''
@@ -66,20 +76,62 @@ jinja2.filters.FILTERS['word_list'] = word_list
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
+  connection = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
+
+  cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+  if request.method == 'POST':
+
+    username = request.form['username']
+    password = request.form['password']
+    if username == '' or password == '':
+      return render_template('login.html', username=username, password=password)
+
+    try:
+      cursor.execute ('''
+        select id, password
+        from users
+        where email = (%s);
+      ''', (username, ))
+    
+      row = cursor.fetchall()[0]
+      id_user = row['id']
+
+      if row['password'] == password:
+        session['id'] = id_user
+        return redirect('/')
+      else:
+        return render_template('login.html', password=None)
+
+    except:
+      return render_template('login.html', username=None, password=None)
+
   return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+
+  session.clear()
+
+  return redirect('/login')
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+
+  if not session.get('id'):
+    return redirect('/login')
 
   connection = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
   cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
   cursor.execute('''
-    select nome
-    from tags;
-  ''')
+    select t.nome "tag"
+    from tags t
+    where t.id_user = (%s);
+  ''', (session.get('id'), ))
 
   results_tags = cursor.fetchall()
 
@@ -102,10 +154,10 @@ def index():
     valor = float(valor)
 
     cursor.execute('''
-      insert into transacoes (date, valor_em_cent, descricao, imgname)
-      values (%s, %s, %s, %s)
+      insert into transacoes (date, valor_em_cent, descricao, imgname, id_user)
+      values (%s, %s, %s, %s, %s)
       returning id;
-    ''', (date, valor*100, descricao, filename, ))
+    ''', (date, valor*100, descricao, filename, session.get('id')))
 
     row = cursor.fetchone()
     id_transacao = row['id']
@@ -114,20 +166,20 @@ def index():
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], str(id_transacao)))
 
     cursor.execute('''
-      select id, nome
-      from tags
-      where nome = (%s);
-    ''', (tags, ))
+      select id, t.nome "tag"
+      from tags t
+      where t.nome = (%s) and t.id_user = (%s);
+    ''', (tags, session.get('id'), ))
 
     results = cursor.fetchall()
 
     if results == []:
 
       cursor.execute('''
-        insert into tags (nome)
-        values (%s)
+        insert into tags (nome, id_user)
+        values (%s, %s)
         returning id;
-      ''', (tags, ))
+      ''', (tags, session.get('id'), ))
 
       tag_row = cursor.fetchone()
     else:
@@ -136,7 +188,7 @@ def index():
     id_tag = tag_row['id']
     cursor.execute('''
       insert into transacao_tag (id_transacao, id_tag)
-      values (%s, %s); 
+      values (%s, %s);
     ''', (id_transacao, id_tag, ))
       
     connection.commit()
@@ -150,14 +202,24 @@ def index():
 @app.route('/consultar', methods=['GET'])
 def consultar():
 
+  if not session.get('id'):
+    return redirect('/login')
+
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
   cur.execute('''
-    select nome
-    from tags;
-  ''')
+    select t.nome "tag"
+    from transacoes tx
+      inner join transacao_tag tg
+        on tx.id = tg.id_transacao
+      inner join tags t
+        on t.id = tg.id_tag
+      inner join users u
+        on u.id = tx.id_user and tx.id_user = (%s)
+		group by t.nome
+  ''', (session.get('id'), ))
 
   results_tags = cur.fetchall()
 
@@ -168,16 +230,18 @@ def consultar():
     descricao = request.args.get('descricao', None)
 
     insert_query = '''
-      select tx.id, tx.date, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome tag
+      select tx.id, tx.date, tx.descricao, tx.valor_em_cent, tx.imgname, t.nome tag, u.id users
       from transacoes tx
         inner join transacao_tag tg
           on tx.id = tg.id_transacao
         inner join tags t
-          on t.id = tg.id_tag 
+          on t.id = tg.id_tag
+        inner join users u
+          on u.id = tx.id_user and tx.id_user = (%s)
       where 1=1
     '''
 
-    parametros = []
+    parametros = [session.get('id')]
 
     if date:
       insert_query += '''
@@ -198,7 +262,7 @@ def consultar():
 
     if tags:
       insert_query += '''
-        and nome in %s
+        and t.nome in %s
       '''
       parametros.append(tuple(tags))
 
@@ -209,25 +273,48 @@ def consultar():
       parametros.append(f"%{descricao}%")
 
     cur.execute(insert_query, parametros)
-    
-    registros = cur.fetchall()
-    transacoes = []
 
-    for registro in registros:
-      transacoes.append({
-        'id': registro['id'],
-        'date': registro['date'],
-        'valor': registro['valor_em_cent']/100,
-        'tags': registro['tag'],
-        'descricao': registro['descricao'],
-        'file': registro['imgname']
-      })
+    registros = cur.fetchall()
+
+    if registros:
+
+      transacoes = []
+
+      for registro in registros:
+        transacoes.append({
+          'id': registro['id'],
+          'date': registro['date'],
+          'valor': registro['valor_em_cent']/100,
+          'tags': registro['tag'],
+          'descricao': registro['descricao'],
+          'file': registro['imgname']
+        })
+    else:
+      if date or descricao or tags or valor:
+        transacoes = []
+      else:
+        transacoes = None
+
+  # parametros_de_filtro = ???
+
+  # teste = carregar_transacoes_do_usuario(parametros_de_filtro)
+  # ao_menos_um_registro = len(teste) > 0
+
+  # if ao_menos_um_registro:
+  #   estado = "ao_menos_um_registro"
+  # elif parametros_de_filtro.ao_menos_um_preenchido():
+  #   estado = "sem_registros_com_filtro_aplicado"
+  # else:
+  #   estado = "sem_registros_sem_filtro"
 
   return render_template('consultar.html', results_tags=results_tags, transacoes=transacoes, date=date, valor=valor, tags=tags, descricao=descricao)
 
 
 @app.route('/uploads/<id_transacao>', methods=['GET'])
 def download_file(id_transacao):
+
+  if not session.get('id'):
+    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -248,6 +335,9 @@ def download_file(id_transacao):
 
 @app.route('/transacoes/<int:id_transacao>/excluir', methods=['POST'])
 def delete_transacoes(id_transacao):
+
+  if not session.get('id'):
+    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -274,6 +364,9 @@ def delete_transacoes(id_transacao):
 @app.route('/transacoes/edit/<int:id_transacao>', methods=['GET', 'POST'])
 def edit_transacoes(id_transacao):
 
+  if not session.get('id'):
+    return redirect('/login')
+
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -286,7 +379,7 @@ def edit_transacoes(id_transacao):
       inner join tags t
         on t.id = tg.id_tag
     where tx.id = %s;
-  ''',(id_transacao, ))
+  ''', (id_transacao, ))
 
   registros = cur.fetchall()
 
@@ -313,20 +406,20 @@ def edit_transacoes(id_transacao):
         valor = float(valor)
 
         cur.execute('''
-          select id, nome
-          from tags
-          where nome = (%s);
-        ''', (tags, ))
+          select id, t.nome
+          from tags t
+          where t.nome = (%s) and t.id_user = (%s);
+        ''', (tags, session.get('id'), ))
 
         results = cur.fetchall()
 
         if results == []:
 
           cur.execute('''
-            insert into tags (nome)
-            values (%s)
+            insert into tags (nome, id_user)
+            values (%s, %s)
             returning id;
-          ''', (tags, ))
+          ''', (tags, session.get('id'), ))
 
           tag_row = cur.fetchone()
 
@@ -391,6 +484,9 @@ def edit_transacoes(id_transacao):
 @app.route('/relatorio', methods=['GET'])
 def relatorio_tag():
 
+  if not session.get('id'):
+    return redirect('/login')
+
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
   cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -407,10 +503,12 @@ def relatorio_tag():
           on tx.id = tg.id_transacao
         inner join tags t
           on t.id = tg.id_tag
+        inner join users u
+          on u.id = tx.id_user and tx.id_user = (%s)
       where extract(year FROM (select date)) = (%s)
         and extract(month FROM (select date)) = (%s)
       group by t.nome;
-    ''',(edit_date[0], edit_date[1], ))
+    ''', (session.get('id'), edit_date[0], edit_date[1], ))
 
     registros = cur.fetchall()
 
