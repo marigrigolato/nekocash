@@ -33,6 +33,9 @@
           <li class="item-menu">
             <a href="/relatorio">Relatório de Tags</a>
           </li>
+          <li class="item-menu">
+            <a href="/logout">Sair</a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -52,7 +55,7 @@
             </div>
             <select name="tags" class="field" multiple>
               {% for tag in results_tags %}
-              <option value="{{ tag['nome'] }}">{{tag['nome']}}</option>
+              <option value="{{ tag['tag'] }}">{{ tag['tag'] }}</option>
               {% endfor %}
             </select>
             <div class="field">
@@ -72,10 +75,10 @@
           </fieldset>
         </form>
         {% if transacoes == [] %}
-        <h3 class="empty-filter">Sorry, there are no results for
-          <span class="text-state-orange">{{ (date | date_format) or (valor | format_currency) or (tags | word_list) or descricao }}</span>
-        </h3>
-      {% endif %}
+          <h3 class="empty-filter">Sorry, there are no results for
+            <span class="text-state-orange">{{ descricao or (tags | word_list) or (valor | format_currency) or (date | date_format) }}</span>
+          </h3>
+        {% endif %}
         {% if transacoes %}
           <table>
             <thead>

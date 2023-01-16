@@ -6,19 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,500;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/static/css/login.css"/>
   </head>
   <body>
     <main>
       <section>
-        <form>
+        <form action="/login" method="post">
           <div class="field">
-            <label>Enter Email</label>
-            <input name="user-email" type="text" value="" autocomplete="off">
+            <label>Email</label>
+            <input name="username" type="text" value="{{ request.form['username'] }}" class="{{ 'is-invalid' if username == '' or usernameError }}" autocomplete="off">
+            {% if username == '' %}
+              <div class="invalid-feedback">E-mail obrigatório</div>
+            {% endif %}
+            {% if usernameError %}
+              <div class="invalid-feedback">{{ usernameError }}</div>
+            {% endif %}
           </div>
           <div class="field">
-            <label>Enter Password</label>
-            <input name="password" type="text" value="" autocomplete="off">
+            <label>Password</label>
+            <input name="password" type="password" value="{{ request.form['password'] }}" class="{{ 'is-invalid' if password == '' or passwordError }}" autocomplete="off">
+            {% if password == '' %}
+              <div class="invalid-feedback">Senha obrigatória</div>
+            {% endif %}
+            {% if passwordError %}
+              <div class="invalid-feedback">{{ passwordError }}</div>
+            {% endif %}
           </div>
           <button type="submit">SIGN IN</button>
         </form>

@@ -33,6 +33,9 @@
           <li class="item-menu">
             <a href="/relatorio">Relatório de Tags</a>
           </li>
+          <li class="item-menu">
+            <a href="/logout">Sair</a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -68,7 +71,7 @@
                 <input type="text" name="tags" id="tag" value="{{ request.form['tags'] or transacao['tag'] }}" class="{{ 'is-invalid' if tags == '' else '' }}" autocomplete="off" list="tags">
                 <datalist id="tags">
                 {% for tag in results_tags %}
-                  <option>{{ tag.nome }}</option>
+                  <option>{{ tag.tag }}</option>
                 {% endfor %}
                 </datalist>
                 {% if tags == "" %}
