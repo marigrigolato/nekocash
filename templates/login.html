@@ -15,12 +15,12 @@
         <form action="/login" method="post">
           <div class="field">
             <label>Email</label>
-            <input name="username" type="text" value="{{ request.form['username'] }}" class="{{ 'is-invalid' if username == '' or usernameError }}" autocomplete="off">
-            {% if username == '' %}
+            <input name="email" type="text" value="{{ request.form['email'] }}" class="{{ 'is-invalid' if email == '' or emailError }}" autocomplete="off">
+            {% if email == '' %}
               <div class="invalid-feedback">E-mail obrigatório</div>
             {% endif %}
-            {% if usernameError %}
-              <div class="invalid-feedback">{{ usernameError }}</div>
+            {% if emailError %}
+              <div class="invalid-feedback">{{ emailError }}</div>
             {% endif %}
           </div>
           <div class="field">
@@ -35,6 +35,10 @@
           </div>
           <button type="submit">SIGN IN</button>
         </form>
+        <div class="sign-up">
+          <span>Conhecendo nekoCash?</span>
+          <a href="/account">Criar uma conta</a>
+        </div>
       </section>
     </main>
   </body>

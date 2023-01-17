@@ -79,23 +79,22 @@ def login():
 
   if request.method == 'POST':
 
-    username = request.form['username']
+    email = request.form['email']
     password = request.form['password']
-    if username == '' or password == '':
-      return render_template('login.html', username=username, password=password)
+    if email == '' or password == '':
+      return render_template('login.html', email=email, password=password)
 
-    # try:
     cursor.execute ('''
       select id, password
       from users
       where email = (%s);
-    ''', (username, ))
+    ''', (email, ))
 
     row = cursor.fetchone()
 
     if row is None:
       # user not found
-      return render_template('login.html', usernameError='E-mail não cadastrado')
+      return render_template('login.html', emailError='E-mail não cadastrado')
 
     id_user = row['id']
 
@@ -104,9 +103,6 @@ def login():
       return redirect('/')
     else:
       return render_template('login.html', passwordError='Senha inválida')
-
-    # except:
-    #   return render_template('login.html', username=None, password=None)
 
   return render_template('login.html')
 
@@ -118,6 +114,50 @@ def logout():
 
   return redirect('/login')
 
+
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+
+  connection = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
+
+  cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+  if request.method == 'POST':
+    first_name = request.form['firstName']
+    last_name = request.form['lastName']
+    email = request.form['email']
+    password = request.form['password']
+    confirm_password = request.form['confirmPassword']
+
+    if first_name == '' or email == '' or password == '' or confirm_password == '':
+      return render_template('account.html', first_name=first_name, email=email, passwordError='Confirme sua senha')
+
+    cursor.execute('''
+      select email
+      from users
+      where email = (%s);
+    ''', (email, ))
+
+    search_for_users = cursor.fetchone()
+
+    if search_for_users is None:
+      if password == confirm_password:
+        cursor.execute('''
+          insert into users (email, password, first_name, last_name)
+          values (%s, %s, %s, %s)
+          returning id;
+        ''', (email, password, first_name, last_name, ))
+        row = cursor.fetchone()
+        id_user = row['id']
+        session['id'] = id_user
+        connection.commit()
+        return redirect('/')
+      else:
+        return render_template('account.html', validationErrors='As senhas inseridas não coincidem')
+    else:
+      return render_template('account.html', emailError='Este endereço de e-mail não está disponível. Escolha um endereço de e-mail diferente.')
+
+  return render_template('account.html')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
