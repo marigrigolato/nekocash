@@ -28,7 +28,6 @@ main {
 }
 
 .invalid-feedback {
-  width: 100%;
   margin-top: 0.25em;
   font-size: 0.8em;
   font-weight: 300;
@@ -41,11 +40,6 @@ a {
 
 a:hover {
   color: #FF6208C9;
-}
-
-label {
-  display: flex;
-  margin-bottom: 0.4em;
 }
 
 .field {
@@ -89,7 +83,7 @@ button:hover {
   text-shadow: none;
 }
 
-.sign-up {
+.sign-in {
   padding: 30px;
   text-align: center;
   font-weight: 400;
