@@ -4,6 +4,7 @@ import psycopg2
 import psycopg2.extras
 from datetime import datetime
 from flask import Flask, redirect, render_template, request, flash, send_from_directory, session
+from functools import wraps
 from werkzeug.utils import secure_filename
 
 
@@ -14,9 +15,19 @@ app.config['SECRET_KEY'] = 'some random string'
 app.config['UPLOAD_FOLDER'] = 'static/files'
 
 
+def login_required(func):
+  @wraps(func)
+  def decorated_function(*args, **kwargs):
+    if not 'id' in session:
+      return redirect('/login')
+    return func(*args, **kwargs)
+  return decorated_function
+
+
 def allowed_file(filename):
   return '.' in filename and \
     filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def format_currency(value):
   if value is None:
@@ -160,10 +171,8 @@ def account():
   return render_template('account.html')
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
-
-  if not session.get('id'):
-    return redirect('/login')
 
   connection = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -242,10 +251,8 @@ def index():
 
 
 @app.route('/consultar', methods=['GET'])
+@login_required
 def consultar():
-
-  if not session.get('id'):
-    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -341,10 +348,8 @@ def consultar():
 
 
 @app.route('/uploads/<id_transacao>', methods=['GET'])
+@login_required
 def download_file(id_transacao):
-
-  if not session.get('id'):
-    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -364,10 +369,8 @@ def download_file(id_transacao):
 
 
 @app.route('/transacoes/<int:id_transacao>/excluir', methods=['POST'])
+@login_required
 def delete_transacoes(id_transacao):
-
-  if not session.get('id'):
-    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -392,10 +395,8 @@ def delete_transacoes(id_transacao):
 
 
 @app.route('/transacoes/edit/<int:id_transacao>', methods=['GET', 'POST'])
+@login_required
 def edit_transacoes(id_transacao):
-
-  if not session.get('id'):
-    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
@@ -512,10 +513,8 @@ def edit_transacoes(id_transacao):
 
 
 @app.route('/relatorio', methods=['GET'])
+@login_required
 def relatorio_tag():
-
-  if not session.get('id'):
-    return redirect('/login')
 
   conn = psycopg2.connect('dbname=nekocash user=marina password=123456 host=127.0.0.1 port=5432')
 
