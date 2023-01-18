@@ -135,9 +135,6 @@ def account():
     if first_name == '' or email == '' or password == '' or confirm_password == '':
       return render_template('account.html', first_name=first_name, email=email, passwordError='Confirme sua senha')
 
-    password_md5 = hashlib.md5(password.encode('utf-8')).hexdigest()
-    confirm_password_md5 = hashlib.md5(confirm_password.encode('utf-8')).hexdigest()
-
     cursor.execute('''
       select email
       from users
@@ -147,7 +144,8 @@ def account():
     search_for_users = cursor.fetchone()
 
     if search_for_users is None:
-      if password_md5 == confirm_password_md5:
+      if password == confirm_password:
+        password_md5 = hashlib.md5(password.encode('utf-8')).hexdigest()
         cursor.execute('''
           insert into users (email, password, first_name, last_name)
           values (%s, %s, %s, %s)
