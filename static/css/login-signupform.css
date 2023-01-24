@@ -1,0 +1,183 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to bottom right, #de4313, #fec163);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card,
+.account-card {
+  position: relative;
+  background-color: rgba(255, 255, 255, .5);
+  width: 450px;
+  padding: 4rem;
+  border-radius: 10px;
+}
+
+.login-card::before,
+.account-card::before {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, .15);
+  inset: 0;
+  transform: rotate(-5deg);
+  z-index: -1;
+}
+
+.login-card-logo {
+  margin-bottom: 2rem;
+}
+
+.login-card-logo img {
+  width: 60px;
+}
+
+.login-card-logo,
+.login-card-footer,
+.account-card-footer {
+  text-align: center;
+}
+
+.login-card-form,
+.account-card-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card-form {
+  gap: 1.5rem;
+}
+
+.form-item {
+  position: relative;
+}
+
+.float-label {
+  padding: 20px;
+}
+
+.form-item-icon {
+  position: absolute;
+  top: .82rem;
+  left: 1.4rem;
+  font-size: 1.3rem!important;
+  opacity: .4;
+}
+
+.login-card-footer,
+.account-card-footer {
+  margin-top: 1.5rem;
+  font-size: calc(1rem * .8);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  color: #f7681c;
+}
+
+input[type='text'],
+input[type='password'] {
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.login-card input {
+  padding: 1rem 1.5rem;
+  padding-left: calc(1rem * 3.5);
+  border-radius: 100px;
+  background: rgba(255, 255, 255, .3);
+}
+
+.login-card input:focus {
+  background: white;
+  color: #495057;
+}
+
+.account-card input {
+  display: block;
+  padding: 0.625rem 0;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, .2);
+  font-size: 1rem;
+}
+
+.account-card label {
+  position: absolute;
+  top: 0;
+  font-size: 1rem;
+  font-weight: 300;
+  pointer-events: none;
+  transform: translateY(30px);
+  transition: all 400ms ease-in-out;
+}
+
+.account-card input.is-filled-in + label,
+.account-card input:focus + label {
+  font-size: 0.8rem;
+  letter-spacing: .006rem;
+  transform: translateY(0);
+}
+
+::placeholder {
+  color: unset;
+}
+
+button {
+  font-family: 'Poppins', sans-serif;
+  background: rgba(0,0,0,0.8);
+  padding: 1rem;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: rgba(0, 0, 0, .85);
+}
+
+.is-invalid {
+  border-bottom-color: #de071c!important;
+}
+
+.is-error {
+  margin-left: 15px;
+}
+
+.invalid-feedback {
+  margin-top: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 300;
+  color: #de071c;
+  letter-spacing: .006rem;
+}
+
+@media (max-width: 768px) {
+
+  body {
+    padding: 2rem 0;
+  }
+
+  .login-card,
+  .account-card {
+    width: 300px;
+    padding: 2rem;
+  }
+
+}
