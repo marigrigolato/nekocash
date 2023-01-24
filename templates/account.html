@@ -6,50 +6,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,500;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/static/css/account.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/css/login-signupform.css">
+    <script>
+
+      function handleIsFilledInClass (event) {
+        const input = event.target;
+        if (input.value !== '') {
+          input.classList.add('is-filled-in');
+        } else {
+          input.classList.remove('is-filled-in');
+        }
+      }
+
+    </script>
   </head>
   <body>
-    <main>
-      <section class="section">
-        <form method="post">
-          <div class="field">
-            <input name="firstName" type="text" value="{{ request.form['firstName'] }}" class="{{ 'is-invalid' if first_name == '' }}" placeholder="Nome" autocomplete="off">
-            {% if first_name == '' %}
-              <div class="invalid-feedback">Insira o nome</div>
-            {% endif %}
-          </div>
-          <div class="field">
-            <input name="lastName" type="text" value="{{ request.form['lastName'] }}" placeholder="Sobrenome" autocomplete="off">
-          </div>
-          <div class="field">
-            <input name="email" type="text" value="{{ request.form['email'] }}" class="{{ 'is-invalid' if email == '' or emailError }}" placeholder="nome@example.com" autocomplete="off">
-            {% if email == '' %}
-              <div class="invalid-feedback">E-mail obrigatório</div>
-            {% endif %}
-            {% if emailError %}
-              <div class="invalid-feedback">{{ emailError }}</div>
-            {% endif %}
-          </div>
-          <div class="field">
-            <input name="password" type="password" value="{{ request.form['password'] }}" class="{{ 'is-invalid' if passwordError or validationErrors }}" placeholder="Senha" autocomplete="off">
-          </div>
-          <div class="field">
-            <input name="confirmPassword" type="password" value="{{ request.form['confirmPassword'] }}" class="{{ 'is-invalid' if passwordError or validationErrors }}" placeholder="Confirmar senha" autocomplete="off">
-            {% if passwordError %}
-              <div class="invalid-feedback">{{ passwordError }}</div>
-            {% endif %}
-            {% if validationErrors %}
-              <div class="invalid-feedback">{{ validationErrors }}</div>
-            {% endif %}
-          </div>
-          <button type="submit">SIGN UP</button>
-        </form>
-        <div class="sign-in">
-          <span>Já tem uma conta?</span>
-          <a href="/login">Encontre-a aqui</a>
+    <div class="account-card">
+      <form class="account-card-form" method="post">
+        <div class="form-item float-label">
+          <input
+            name="firstName" type="text" value="{{ request.form['firstName'] }}"
+            class="{{ 'is-invalid' if first_name == '' }} {{ 'is-filled-in' if first_name }}"
+            autocomplete="off" spellcheck="false"
+            onchange="handleIsFilledInClass(event)"
+          >
+          <label>Nome</label>
+          {% if first_name == '' %}
+            <div class="invalid-feedback">Insira o nome</div>
+          {% endif %}
         </div>
-      </section>
-    </main>
+        <div class="form-item float-label">
+          <input
+            name="lastName" type="text" value="{{ request.form['lastName'] }}"
+            class="{{ 'is-invalid' if last_name == '' }} {{ 'is-filled-in' if last_name }}"
+            autocomplete="off" spellcheck="false"
+            onchange="handleIsFilledInClass(event)"
+          >
+          <label>Sobrenome</label>
+          {% if last_name == '' %}
+            <div class="invalid-feedback">Insira o sobrenome</div>
+          {% endif %}
+        </div>
+        <div class="form-item float-label">
+          <input
+            name="email" type="text" value="{{ request.form['email'] }}"
+            class="{{ 'is-invalid' if email == '' or emailError }} {{ 'is-filled-in' if email }}"
+            autocomplete="off" spellcheck="false"
+            onchange="handleIsFilledInClass(event)"
+          >
+          <label>nome@example.com</label>
+          {% if email == '' %}
+            <div class="invalid-feedback">E-mail obrigatório</div>
+          {% endif %}
+          {% if emailError %}
+            <div class="invalid-feedback">{{ emailError }}</div>
+          {% endif %}
+        </div>
+        <div class="form-item float-label">
+          <input
+            name="password" type="password" value="{{ request.form['password'] }}"
+            class="{{ 'is-invalid' if passwordError or validationErrors }} {{ 'is-filled-in' if password }}"
+            autocomplete="off"
+            onchange="handleIsFilledInClass(event)"
+          >
+          <label>Senha</label>
+        </div>
+        <div class="form-item float-label">
+          <input
+            name="confirmPassword" type="password" value="{{ request.form['confirmPassword'] }}"
+            class="{{ 'is-invalid' if passwordError or validationErrors }} {{ 'is-filled-in' if confirm_password }}"
+            autocomplete="off"
+            onchange="handleIsFilledInClass(event)"
+          >
+          <label>Confirmar senha</label>
+          {% if passwordError %}
+            <div class="invalid-feedback">{{ passwordError }}</div>
+          {% endif %}
+          {% if validationErrors %}
+            <div class="invalid-feedback">{{ validationErrors }}</div>
+          {% endif %}
+        </div>
+        <button type="submit">CADASTRAR</button>
+      </form>
+      <div class="account-card-footer">
+        <span>Já tem uma conta?</span>
+        <a href="/login">Encontre-a aqui</a>
+      </div>
+    </div>
   </body>
 </html>

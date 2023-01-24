@@ -130,7 +130,7 @@ def account():
     confirm_password = request.form['confirmPassword']
 
     if first_name == '' or email == '' or password == '' or confirm_password == '':
-      return render_template('account.html', first_name=first_name, email=email, passwordError='Confirme sua senha')
+      return render_template('account.html', first_name=first_name, last_name=last_name, email=email, password=password, confirm_password=confirm_password, passwordError='Confirme sua senha')
 
     cursor.execute('''
       select email
@@ -153,9 +153,9 @@ def account():
         connection.commit()
         return redirect('/')
       else:
-        return render_template('account.html', validationErrors='As senhas inseridas não coincidem')
+        return render_template('account.html', first_name=first_name, last_name=last_name, email=email, password=password, confirm_password=confirm_password, validationErrors='As senhas inseridas não coincidem')
     else:
-      return render_template('account.html', emailError='Este endereço de e-mail não está disponível. Escolha um endereço de e-mail diferente.')
+      return render_template('account.html', first_name=first_name, last_name=last_name, email=email, password=password, confirm_password=confirm_password, emailError='Este endereço de e-mail não está disponível. Escolha um endereço de e-mail diferente.')
 
   return render_template('account.html')
 
