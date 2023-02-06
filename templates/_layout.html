@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nekoCash</title>
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;700&family=PT+Serif&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/css/_common.css"/>
+    {% block head %}{% endblock %}
+    <script>
+
+      function toggleNav () {
+        const root = document.getElementById('root');
+        const classList = root.classList;
+        classList.toggle('nav-open');
+      }
+
+      function onBlurValidatorsRequired (nameId, event) {
+        const errorSpan = document.querySelector('#' + nameId + '-error');
+        const input = event.target;
+        if (input.value === '') {
+          input.classList.add('is-invalid');
+          errorSpan.textContent = 'Campo obrigatório'
+        } else {
+          input.classList.remove('is-invalid');
+          errorSpan.textContent = ''
+        }
+      }
+
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <header id="header">
+        <div id="toggle" onclick="toggleNav()">
+          <div class="n-logo is-not-visible">
+            <div class="initial-n"></div>
+            <div class="initial-n final-n"></div>
+          </div>
+          <svg viewBox="0 0 24 11" class="menu-toggle">
+            <g fill="currentColor" stroke="currentColor">
+              <path d="M0,16 L24,16 L24,17 L0,17 L0,16 Z"></path>
+              <path d="M0,0 L24,0 L24,1 L0,1 L0,0 Z"></path>
+              <path d="M0,8 L24,8 L24,9 L0,9 L0,8 Z"></path>
+            </g>
+          </svg>
+        </div>
+        <nav id="nav-menu">
+          <a href="/">
+            <div class="n-logo is-visible">
+              <div class="initial-n"></div>
+              <div class="initial-n final-n"></div>
+              <div id="logo">ekoCash</div>
+            </div>
+          </a>
+          <ul id="list-menu">
+            <li class="item-menu">
+              <a href="/">Incluir</a>
+            </li>
+            <li class="item-menu">
+              <a href="/consultar">Consultar</a>
+            </li>
+            <li class="item-menu">
+              <a href="/relatorio">Relatório de tags</a>
+            </li>
+            <li class="item-menu">
+              <a href="/logout">Sair</a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <div id="container">
+        {% block message %}{% endblock %}
+        <div id="section-title">
+          <h1 class="title">{% block title %}{% endblock %}</h1>
+        </div>
+        <div id="main">
+          <div id="main-content">
+            {% block content %}
+            {% endblock %}
+          </div>
+        </div>
+        <footer id="footer-contents">
+          <div class="footer-column">
+            <img src="/static/img/neko.svg" alt="neko Image" class="neko-image">
+            <div class="footer">
+              <div class="footer-copyright">
+                <p>Copyright © 2022 NekoApp Inc. Todos os direitos reservados.</p>
+              </div>
+              <div class="social-icons">
+                <p>Siga-nos</p>
+                <ul class="social-icons_list">
+                  <li class="social-icons_item">
+                    <a href="https://www.facebook.com/joicemarina" target="_blank">
+                      <img src="/static/img/facebook.svg" alt="Facebook Icon">
+                    </a>
+                  </li>
+                  <li class="social-icons_item">
+                    <a href="https://twitter.com/marigrigolato" target="_blank">
+                      <img src="/static/img/twitter.svg" alt="Twitter Icon">
+                    </a>
+                  </li>
+                  <li class="social-icons_item">
+                    <a href="https://www.instagram.com/marigrigolato/" target="_blank">
+                      <img src="/static/img/instagram.svg" alt="Instagram Icon">
+                    </a>
+                  </li>
+                  <li class="social-icons_item">
+                    <a href="https://www.linkedin.com/in/joice-grigolato/" target="_blank">
+                      <img src="/static/img/linkedin.svg" alt="LinkedIn Icon">
+                    </a>
+                  </li>
+                  <li class="social-icons_item">
+                    <a href="https://github.com/marigrigolato" target="_blank">
+                      <img src="/static/img/github.svg" alt="GitHub Icon">
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
