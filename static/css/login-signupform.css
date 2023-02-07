@@ -12,6 +12,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 400;
 }
 
 .login-card,
@@ -138,6 +139,7 @@ input[type='password'] {
 
 button {
   font-family: 'Poppins', sans-serif;
+  font-weight: 500;
   background: rgba(0,0,0,0.8);
   padding: 1rem;
   color: #fff;
