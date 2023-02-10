@@ -1,6 +1,6 @@
 import os
 import jinja2
-import hashlib
+import bcrypt
 import psycopg2
 import psycopg2.extras
 from datetime import datetime
@@ -92,11 +92,9 @@ def login():
   if request.method == 'POST':
 
     email = request.form['email']
-    password = request.form['password']
-    if email == '' or password == '':
-      return render_template('login.html', email=email, password=password)
-
-    password_md5 = hashlib.md5(password.encode('utf-8')).hexdigest()
+    userPassword = request.form['password']
+    if email == '' or userPassword == '':
+      return render_template('login.html', email=email, userPassword=userPassword)
 
     cursor.execute ('''
       select id, password
@@ -112,7 +110,7 @@ def login():
 
     id_user = row['id']
 
-    if row['password'] == password_md5:
+    if bcrypt.checkpw(userPassword.encode("utf-8"), row['password'].encode('utf-8')):
       session['id'] = id_user
       return redirect('/')
     else:
@@ -156,12 +154,14 @@ def account():
 
     if search_for_users is None:
       if password == confirm_password:
-        password_md5 = hashlib.md5(password.encode('utf-8')).hexdigest()
+        salt = bcrypt.gensalt(rounds=14)
+        pwd_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
         cursor.execute('''
           insert into users (email, password, first_name, last_name)
           values (%s, %s, %s, %s)
           returning id;
-        ''', (email, password_md5, first_name, last_name, ))
+        ''', (email, pwd_hash, first_name, last_name, ))
         row = cursor.fetchone()
         id_user = row['id']
         session['id'] = id_user
